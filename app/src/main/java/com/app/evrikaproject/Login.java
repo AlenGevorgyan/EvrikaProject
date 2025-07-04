@@ -28,7 +28,7 @@ public class Login extends AppCompatActivity {
         etPassword = findViewById(R.id.password);
         registerTV = findViewById(R.id.registerNow);
         registerTV.setOnClickListener(v -> register());
-        findViewById(R.id.btn_login).setOnClickListener(v -> loginUser());
+        findViewById(R.id.loginBtn).setOnClickListener(v -> loginUser());
     }
 
     private void register(){

@@ -21,18 +21,18 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        etUsername = findViewById(R.id.et_username);
-        etRealName = findViewById(R.id.et_real_name);
-        etRealSurname = findViewById(R.id.et_real_surname);
-        etEmail = findViewById(R.id.et_email);
-        etPassword = findViewById(R.id.et_password);
-        etConfirmPassword = findViewById(R.id.et_confirmpassword);
-        etAge = findViewById(R.id.et_age);
-        etGender = findViewById(R.id.et_gender);
+        etUsername = findViewById(R.id.username);
+        etRealName = findViewById(R.id.name);
+        etRealSurname = findViewById(R.id.surname);
+        etEmail = findViewById(R.id.email);
+        etPassword = findViewById(R.id.password);
+        etConfirmPassword = findViewById(R.id.confirmPassword);
+        etAge = findViewById(R.id.age);
+        etGender = findViewById(R.id.gender);
 
         etGender.setOnClickListener(v -> showGenderDialog());
 
-        findViewById(R.id.btn_register).setOnClickListener(v -> registerUser());
+        findViewById(R.id.registerNow).setOnClickListener(v -> registerUser());
     }
 
     private void showGenderDialog() {

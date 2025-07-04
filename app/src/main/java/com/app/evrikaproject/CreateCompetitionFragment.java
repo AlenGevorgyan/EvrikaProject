@@ -11,6 +11,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FieldValue;
 
@@ -159,59 +161,33 @@ public class CreateCompetitionFragment extends Fragment {
         String compId = db.collection("games").document().getId();
         List<String> initialPlayers = new ArrayList<>();
         initialPlayers.add(userId);
-        Competition comp = new Competition(
-                compId,
-                name,
-                sport,
-                type,
-                userId,
-                initialPlayers,
-                new ArrayList<>(),
-                selectedDate,
-                teamPlayerCount,
-                selectedLat,
-                selectedLng
-        );
-        db.collection("games").document(compId)
-                .set(comp)
-                .addOnSuccessListener(aVoid -> {
-                    db.collection("users").document(userId)
-                        .update("registeredGames", FieldValue.arrayUnion(compId))
-                        .addOnSuccessListener(aVoidX -> {
-                            db.collection("games").document(compId)
-                                .update("imageUrl", imageUrl,
-                                        "teamPlayerCount", teamPlayerCount,
-                                        "latitude", selectedLat,
-                                        "longitude", selectedLng,
-                                        "date", selectedDate)
-                                .addOnSuccessListener(aVoid2 -> {
-                                    Map<String, Object> competitionData = new HashMap<>();
-                                    competitionData.put("posterId", compId);
-                                    competitionData.put("name", name);
-                                    competitionData.put("sport", sport);
-                                    competitionData.put("type", type);
-                                    competitionData.put("createdBy", userId);
-                                    competitionData.put("teams", initialPlayers);
-                                    competitionData.put("invitedTeams", new ArrayList<>());
-                                    competitionData.put("imageUrl", imageUrl);
-                                    competitionData.put("teamPlayerCount", teamPlayerCount);
-                                    competitionData.put("latitude", selectedLat);
-                                    competitionData.put("longitude", selectedLng);
-                                    competitionData.put("date", selectedDate);
-                                    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("competitions");
-                                    dbRef.child(compId).setValue(competitionData)
-                                        .addOnSuccessListener(aVoid3 -> {
-                                            Toast.makeText(getContext(), "Competition created!", Toast.LENGTH_SHORT).show();
-                                            if (getActivity() != null) {
-                                                getActivity().getSupportFragmentManager().beginTransaction()
-                                                    .replace(R.id.fragment_container, new HomeFragment())
-                                                    .commit();
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save to Realtime DB: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                                });
-                        });
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+        Map<String, Object> competitionData = new HashMap<>();
+        competitionData.put("compId", compId);
+        competitionData.put("name", name);
+        competitionData.put("sport", sport);
+        competitionData.put("type", type);
+        competitionData.put("posterId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        competitionData.put("teams", initialPlayers);
+        competitionData.put("invitedTeams", new ArrayList<>());
+        competitionData.put("imageUrl", imageUrl);
+        competitionData.put("teamPlayerCount", teamPlayerCount);
+        competitionData.put("latitude", selectedLat);
+        competitionData.put("longitude", selectedLng);
+        competitionData.put("date", selectedDate);
+
+        CollectionReference reference = FirebaseFirestore.getInstance().collection("games");
+
+        reference.document(compId).set(competitionData)
+                .addOnCompleteListener(toFirebase -> {
+                    if (toFirebase.isSuccessful()) {
+                        Log.d("Firestore", "Document uploaded successfully");
+
+                    } else {
+                        Log.e("Firestore", "Error uploading document: ");
+
+                    }
+
+                });
     }
 }

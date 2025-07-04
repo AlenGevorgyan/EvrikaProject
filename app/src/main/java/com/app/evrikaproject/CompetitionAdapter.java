@@ -1,6 +1,7 @@
 package com.app.evrikaproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.ArrayList;
 
 public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.CompetitionViewHolder> {
     private List<Competition> competitions;
@@ -19,6 +21,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
     private OnCompetitionClickListener listener;
     private String userId;
     private boolean registeredMode;
+    private List<String> registeredGameIds;
 
     public interface OnCompetitionClickListener {
         void onJoin(Competition competition);
@@ -32,6 +35,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         this.listener = listener;
         this.userId = userId;
         this.registeredMode = registeredMode;
+        this.registeredGameIds = new ArrayList<>();
     }
 
     @NonNull
@@ -57,18 +61,28 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         } else {
             holder.bgSportImage.setImageResource(R.drawable.ic_launcher_background);
         }
-        boolean isRegistered = comp.teams != null && userId != null && comp.teams.contains(userId);
-        if (registeredMode) {
-            holder.btnViewDetails.setText("Remove");
-            holder.btnViewDetails.setOnClickListener(v -> listener.onRemove(comp));
-        } else if (isRegistered) {
-            holder.btnViewDetails.setText("Remove");
-            holder.btnViewDetails.setOnClickListener(v -> listener.onRemove(comp));
+        boolean isRegistered = registeredGameIds != null && comp.id != null && registeredGameIds.contains(comp.id);
+        if (registeredMode || isRegistered) {
+            holder.btnViewDetails.setText("Chat");
+            holder.btnViewDetails.setOnClickListener(v -> listener.onViewDetails(comp));
+            holder.btnViewDetails.setOnLongClickListener(v -> {
+                listener.onRemove(comp);
+                return true;
+            });
         } else {
             holder.btnViewDetails.setText("Join now");
             holder.btnViewDetails.setOnClickListener(v -> listener.onJoin(comp));
+            holder.btnViewDetails.setOnLongClickListener(null);
         }
         holder.ivUserAvatar.setImageResource(R.drawable.ic_person); // Placeholder for user avatar
+        holder.tvLocation.setOnClickListener(v -> {
+            if (comp.latitude != 0 && comp.longitude != 0) {
+                Intent intent = new Intent(context, MapViewLocationActivity.class);
+                intent.putExtra("lat", comp.latitude);
+                intent.putExtra("lng", comp.longitude);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -78,6 +92,11 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
 
     public void setCompetitions(List<Competition> competitions) {
         this.competitions = competitions;
+        notifyDataSetChanged();
+    }
+
+    public void setRegisteredGameIds(List<String> registeredGameIds) {
+        this.registeredGameIds = registeredGameIds;
         notifyDataSetChanged();
     }
 

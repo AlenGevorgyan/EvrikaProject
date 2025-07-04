@@ -11,13 +11,6 @@
         android:background="@android:color/white"
         android:padding="16dp">
 
-        <!-- SearchView for place search -->
-        <SearchView
-            android:id="@+id/mapSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:queryHint="Search for a place"/>
-
         <EditText
             android:id="@+id/et_competition_name"
             android:layout_width="match_parent"
@@ -87,6 +80,16 @@
                 android:maxLines="1"
                 android:textColor="@android:color/black"/>
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_pick_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick Location on Map"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@color/white"/>
 
         <!-- Date -->
 

@@ -31,6 +31,10 @@
         </activity>
         <activity android:name=".Register" />
         <activity android:name=".LoginOtp"/>
+        <activity android:name=".SettingsActivity"/>
+        <activity android:name=".MainSettingsActivity"/>
+        <activity android:name=".MapPickerActivity"/>
+        <activity android:name=".MapViewLocationActivity"/>
     </application>
 
 </manifest>

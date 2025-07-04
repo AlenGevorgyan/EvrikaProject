@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.nav_home){
             fragment = new HomeFragment();
         } else if(item.getItemId() == R.id.nav_registered){
-            fragment = new ProfileFragment();
+            fragment = new RegisteredGamesFragment();
         } else if(item.getItemId() == R.id.nav_profile){
             fragment = new ProfileFragment();
         }

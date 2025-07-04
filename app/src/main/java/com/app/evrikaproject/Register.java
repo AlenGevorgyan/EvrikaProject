@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Register extends AppCompatActivity {
     private EditText etUsername, etRealName, etRealSurname, etEmail, etPassword, etConfirmPassword, etAge, etGender;
@@ -110,6 +112,7 @@ public class Register extends AppCompatActivity {
         public String email;
         public int age;
         public String gender;
+        public List<String> registeredGames;
         public User() {}
         public User(String uid, String username, String realName, String realSurname, String email, int age, String gender) {
             this.uid = uid;
@@ -119,6 +122,7 @@ public class Register extends AppCompatActivity {
             this.email = email;
             this.age = age;
             this.gender = gender;
+            this.registeredGames = new ArrayList<>();
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
     private List<Competition> competitions = new ArrayList<>();
     private List<Competition> allCompetitions = new ArrayList<>();
     private FirebaseFirestore db;
+    private List<String> registeredGames = new ArrayList<>();
 
     @Nullable
     @Override
@@ -37,13 +39,27 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         adapter = new CompetitionAdapter(getContext(), competitions, new CompetitionAdapter.OnCompetitionClickListener() {
             @Override
             public void onJoin(Competition competition) {
-                // TODO: Implement join logic
-                Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                if (userId == null) return;
+                FirebaseFirestore.getInstance().collection("users").document(userId)
+                    .update("registeredGames", FieldValue.arrayUnion(competition.id))
+                    .addOnSuccessListener(aVoid -> {
+                        registeredGames.add(competition.id);
+                        adapter.setRegisteredGameIds(registeredGames);
+                        Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
             @Override
             public void onRemove(Competition competition) {
-                // TODO: Implement remove logic
-                Toast.makeText(getContext(), "Removed from competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                if (userId == null) return;
+                FirebaseFirestore.getInstance().collection("users").document(userId)
+                    .update("registeredGames", FieldValue.arrayRemove(competition.id))
+                    .addOnSuccessListener(aVoid -> {
+                        registeredGames.remove(competition.id);
+                        adapter.setRegisteredGameIds(registeredGames);
+                        Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
             @Override
             public void onViewDetails(Competition competition) {
@@ -56,7 +72,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
-        loadCompetitions();
+        loadUserRegisteredGames(userId);
 
         FloatingActionButton fab = view.findViewById(R.id.fab_create_competition);
         fab.setOnClickListener(v -> {
@@ -67,6 +83,17 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         });
 
         return view;
+    }
+
+    private void loadUserRegisteredGames(String userId) {
+        if (userId == null) return;
+        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+            .addOnSuccessListener(doc -> {
+                registeredGames = (List<String>) doc.get("registeredGames");
+                if (registeredGames == null) registeredGames = new ArrayList<>();
+                adapter.setRegisteredGameIds(registeredGames);
+                loadCompetitions();
+            });
     }
 
     private void loadCompetitions() {
@@ -84,16 +111,27 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             allCompetitions.add(comp);
         }
         adapter.setCompetitions(competitions);
+        adapter.setRegisteredGameIds(registeredGames);
     }
 
     @Override
     public void onJoin(Competition competition) {
-
+        String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        if (userId == null) return;
+        FirebaseFirestore.getInstance().collection("users").document(userId)
+            .update("registeredGames", FieldValue.arrayUnion(competition.id))
+            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show())
+            .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override
     public void onRemove(Competition competition) {
-
+        String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        if (userId == null) return;
+        FirebaseFirestore.getInstance().collection("users").document(userId)
+            .update("registeredGames", FieldValue.arrayRemove(competition.id))
+            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show())
+            .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override

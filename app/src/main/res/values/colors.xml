@@ -7,4 +7,9 @@
     <color name="colorPrimary">#FFB98A</color>
     <color name="colorSecondary">#F0F0F0</color>
     <color name="gray">#BABABA</color>
+
+    <color name="textColorPrimary">#FF000000</color>
+    <color name="textColorSecondary">#99000000</color>
+    <color name="hintColor">#BABABA</color>
+    <color name="logout">#C30000</color>
 </resources>

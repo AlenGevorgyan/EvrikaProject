@@ -27,25 +27,27 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:background="@color/white">
+                android:background="@android:color/white">
 
                 <TextView
-                    android:text="@string/login"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:layout_marginBottom="24dp"
-                    android:textColor="@color/black"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
+                    android:layout_height="wrap_content"
+                    android:text="Login"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="24dp"
+                    android:textColor="@android:color/black"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="@color/gray"
+                    app:hintTextColor="@color/gray"
+                    android:hint="Email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconTint="@color/design_default_color_primary">
+                    app:startIconTint="@color/colorPrimary">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/email"
                         android:hint="Email"
@@ -61,18 +63,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     app:endIconMode="password_toggle"
-                    app:startIconTint="@color/design_default_color_primary"
+                    app:startIconTint="@color/colorPrimary"
+                    app:boxStrokeColor="@color/gray"
+                    app:hintTextColor="@color/gray"
+                    android:hint="Password"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password"
-                        android:hint="@string/password"
+                        android:hint="Password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
                         android:inputType="textPassword">
                     </com.google.android.material.textfield.TextInputEditText>
                 </com.google.android.material.textfield.TextInputLayout>
-
 
                 <ProgressBar
                     android:id="@+id/progressBar"
@@ -82,7 +86,8 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_login"
-                    android:text="@string/login"
+                    android:text="Login"
+                    android:textColor="@color/white"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:textSize="16sp"
@@ -114,9 +119,8 @@
                         android:layout_height="wrap_content"
                         android:text="@string/click_to_register"
                         android:textSize="14sp"
-                        android:textColor="@color/design_default_color_primary"
+                        android:textColor="@color/colorPrimary"
                         android:textStyle="bold"/>
-
 
                 </LinearLayout>
                 <TextView

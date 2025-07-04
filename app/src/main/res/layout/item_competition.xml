@@ -1,59 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="12dp">
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="4dp">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="450dp">
 
-        <TextView
-            android:id="@+id/tv_competition_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Competition Name"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="@color/black" />
+        <ImageView
+            android:id="@+id/bg_sport_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
 
-        <TextView
-            android:id="@+id/tv_sport_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sport: Football"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/gray"
-            android:layout_marginTop="4dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="bottom|center_horizontal"
+            android:padding="16dp"
+            android:background="#66000000">
 
-        <TextView
-            android:id="@+id/tv_competition_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Type: League"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/gray"
-            android:layout_marginTop="2dp" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_user_avatar"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_person"
+                app:shapeAppearanceOverlay="@style/CircularImageView"
+                android:background="@drawable/circle_background"
+                android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:id="@+id/tv_teams_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Teams: 0"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            android:textColor="@color/gray"
-            android:layout_marginTop="2dp" />
+            <TextView
+                android:id="@+id/tv_competition_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Competition Name"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"/>
 
-        <Button
-            android:id="@+id/btn_view_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View Details"
-            android:layout_marginTop="12dp"
-            style="@style/Widget.Material3.Button.TonalButton"/>
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tv_sport_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Football"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2025-07-04 16:00"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_player_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Players: 10"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location: Stadium"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_view_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Join now"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@android:color/holo_green_light"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

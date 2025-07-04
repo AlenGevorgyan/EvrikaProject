@@ -3,20 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary_color"></color>
 
-    <color name="colorPrimary">#1976D2</color>
-    <color name="colorPrimaryDark">#004BA0</color>
-    <color name="colorAccent">#FF9800</color>
-    <color name="colorSecondary">#43A047</color>
-    <color name="colorSecondaryDark">#368039</color>
-    <color name="colorBackground">#F5F7FA</color>
-    <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorOnBackground">#222222</color>
-    <color name="colorOnSurface">#222222</color>
-    <color name="colorCard">#FFFFFF</color>
-    <color name="colorDivider">#E0E0E0</color>
-    <color name="gray">#D3D3D3</color>
+    <color name="colorPrimary">#FFB98A</color>
+    <color name="colorSecondary">#F0F0F0</color>
+    <color name="gray">#BABABA</color>
 </resources>

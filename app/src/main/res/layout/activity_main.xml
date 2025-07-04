@@ -4,45 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:title="Evrika Project"
-        app:menu="@menu/main_top_bar_menu"
-        android:background="?attr/colorPrimary"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:title="Evrika Sports"
         app:titleTextColor="@android:color/white"
-        android:layout_alignParentTop="true" />
+        app:titleCentered="true" />
 
     <!-- Fragment Container -->
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
-        android:layout_below="@+id/topAppBar"
-        android:layout_above="@id/devider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorBackground" />
+        android:layout_below="@id/topAppBar"
+        android:layout_above="@id/divider" />
 
+    <!-- Divider -->
     <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/devider"
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_above="@id/bottomNavigation"
-        app:dividerColor="@color/gray" />
+        android:layout_above="@id/bottom_navigation"
+        app:dividerColor="@color/colorSecondary" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
+        android:id="@+id/bottom_navigation"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/main_bottom_nav"
-        app:backgroundTint="@color/colorPrimary"
-        app:itemBackground="@color/colorPrimaryDark"
-        app:itemIconTint="@drawable/bottom_navigation_selector"
-        app:itemTextColor="@color/bottom_navigation_text_color_selector" />
+        android:background="@color/colorPrimary"
+        app:itemIconTint="@color/colorSecondary"
+        app:itemBackground="@color/colorPrimary"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/main_bottom_nav"/>
 
 </RelativeLayout>

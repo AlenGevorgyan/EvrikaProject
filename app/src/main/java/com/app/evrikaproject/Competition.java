@@ -10,10 +10,12 @@ public class Competition {
     public String createdBy;
     public List<String> teams;
     public List<String> invitedTeams;
+    public String date;
+    public int teamPlayerCount;
 
     public Competition() {} // Firestore needs this
 
-    public Competition(String id, String name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams) {
+    public Competition(String id, String name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount) {
         this.id = id;
         this.name = name;
         this.sport = sport;
@@ -21,5 +23,7 @@ public class Competition {
         this.createdBy = createdBy;
         this.teams = teams;
         this.invitedTeams = invitedTeams;
+        this.date = date;
+        this.teamPlayerCount = teamPlayerCount;
     }
 } 

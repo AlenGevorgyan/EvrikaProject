@@ -16,6 +16,13 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Auto-login if already signed in and verified
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null && firebaseUser.isEmailVerified()) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_login);
         etEmail = findViewById(R.id.email);
         etPassword = findViewById(R.id.password);

@@ -30,7 +30,7 @@ public class LoginOtp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_otp);
 
-        verifyOtpButton = findViewById(R.id.verifyOtpButton);
+        verifyOtpButton = findViewById(R.id.btn_verify_otp);
         resendLinkButton = findViewById(R.id.resendLinkButton);
         otpInstructionText = findViewById(R.id.otpInstructionText);
         timerText = findViewById(R.id.timerText);

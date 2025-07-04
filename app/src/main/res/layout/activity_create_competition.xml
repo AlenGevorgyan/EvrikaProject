@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- SearchView for place search -->
+        <SearchView
+            android:id="@+id/mapSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="Search for a place"/>
+
+        <!-- Main Image -->
+        <ImageView
+            android:id="@+id/iv_main_image"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:background="@color/colorDivider"
+            android:contentDescription="Main Image"
+            android:layout_marginBottom="8dp"/>
+        <Button
+            android:id="@+id/btn_pick_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Main Image"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- MapLibre MapView for location picking -->
+        <org.maplibre.android.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp" />
+
+        <EditText
+            android:id="@+id/et_competition_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Competition Name"
+            android:inputType="textPersonName"
+            android:layout_marginTop="16dp" />
+
+        <Spinner
+            android:id="@+id/spinner_sport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <RadioButton
+                android:id="@+id/rb_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Public"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rb_private"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Private"
+                android:layout_marginStart="24dp" />
+        </RadioGroup>
+
+        <!-- Team Player Count -->
+        <EditText
+            android:id="@+id/et_team_player_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Team Player Count"
+            android:inputType="number"
+            android:layout_marginTop="16dp" />
+
+        <!-- Place on Map (now shows picked lat/lng) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="No location selected"
+                android:paddingStart="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+        </LinearLayout>
+
+        <!-- Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+            <Button
+                android:id="@+id/btn_pick_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick Date" />
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="No date selected"
+                android:paddingStart="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_create_competition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Competition"
+            android:layout_marginTop="32dp" />
+    </LinearLayout>
+</ScrollView> 

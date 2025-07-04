@@ -1,14 +1,16 @@
 package com.app.evrikaproject;
 
 import android.app.Application;
-import org.maplibre.android.MapLibre;
-import org.maplibre.android.WellKnownTileServer;
+import com.google.firebase.FirebaseApp;
 
 public class EvrikaApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Initialize MapLibre with no API key and MapTiler as the tile server
-        MapLibre.getInstance(this, "", WellKnownTileServer.MapTiler);
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this);
+        // If you use MapLibre, you can also initialize it here as needed
+        // Example:
+        // MapLibre.getInstance(this, "", WellKnownTileServer.MapTiler);
     }
 } 

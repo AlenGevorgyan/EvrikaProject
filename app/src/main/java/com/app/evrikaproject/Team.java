@@ -9,7 +9,7 @@ public class Team {
     public List<String> members;
     public String inviteCode;
 
-    public Team() {} // Firestore needs this
+    public Team() {}
 
     public Team(String id, String name, String createdBy, List<String> members, String inviteCode) {
         this.id = id;

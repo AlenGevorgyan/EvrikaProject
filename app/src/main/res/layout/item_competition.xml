@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_competition_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Competition Name"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_sport_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sport: Football"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/gray"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tv_competition_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type: League"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/gray"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:id="@+id/tv_teams_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Teams: 0"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textColor="@color/gray"
+            android:layout_marginTop="2dp" />
+
+        <Button
+            android:id="@+id/btn_view_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Details"
+            android:layout_marginTop="12dp"
+            style="@style/Widget.Material3.Button.TonalButton"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -149,7 +149,7 @@ public class ProfileFragment extends Fragment {
                     public void onRemove(Competition competition) {
                         if (userId == null) return;
                         FirebaseFirestore.getInstance().collection("users").document(userId)
-                            .update("registeredGames", FieldValue.arrayRemove(competition.id))
+                            .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
                             .addOnSuccessListener(aVoid -> showRegisteredCompetitions());
                     }
                     @Override

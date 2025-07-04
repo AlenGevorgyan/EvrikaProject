@@ -58,10 +58,12 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.bgSportImage.setImageResource(R.drawable.football);
         } else if (comp.sport != null && comp.sport.equalsIgnoreCase("basketball")) {
             holder.bgSportImage.setImageResource(R.drawable.basketball);
+        } else if (comp.sport != null && comp.sport.equalsIgnoreCase("volleyball")) {
+            holder.bgSportImage.setImageResource(R.drawable.volley);
         } else {
             holder.bgSportImage.setImageResource(R.drawable.ic_launcher_background);
         }
-        boolean isRegistered = registeredGameIds != null && comp.id != null && registeredGameIds.contains(comp.id);
+        boolean isRegistered = registeredGameIds != null && comp.posterId != null && registeredGameIds.contains(comp.posterId);
         if (registeredMode || isRegistered) {
             holder.btnViewDetails.setText("Chat");
             holder.btnViewDetails.setOnClickListener(v -> listener.onViewDetails(comp));

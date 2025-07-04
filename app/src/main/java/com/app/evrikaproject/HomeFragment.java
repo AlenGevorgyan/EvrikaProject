@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,20 +22,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
+import androidx.core.content.ContextCompat;
 
 public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompetitionClickListener {
     private RecyclerView recyclerView;
     private CompetitionAdapter adapter;
+    private MaterialButton btnFilterAll, btnFilterFootball, btnFilterBasketball, btnFilterVolleyball;
     private List<Competition> competitions = new ArrayList<>();
     private List<Competition> allCompetitions = new ArrayList<>();
     private FirebaseFirestore db;
     private List<String> registeredGames = new ArrayList<>();
+    private String selectedSport = "All";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = view.findViewById(R.id.recycler_competitions);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         adapter = new CompetitionAdapter(getContext(), competitions, new CompetitionAdapter.OnCompetitionClickListener() {
@@ -41,9 +47,9 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             public void onJoin(Competition competition) {
                 if (userId == null) return;
                 FirebaseFirestore.getInstance().collection("users").document(userId)
-                    .update("registeredGames", FieldValue.arrayUnion(competition.id))
+                    .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
                     .addOnSuccessListener(aVoid -> {
-                        registeredGames.add(competition.id);
+                        registeredGames.add(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
                     })
@@ -53,9 +59,9 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             public void onRemove(Competition competition) {
                 if (userId == null) return;
                 FirebaseFirestore.getInstance().collection("users").document(userId)
-                    .update("registeredGames", FieldValue.arrayRemove(competition.id))
+                    .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
                     .addOnSuccessListener(aVoid -> {
-                        registeredGames.remove(competition.id);
+                        registeredGames.remove(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
                     })
@@ -81,6 +87,17 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                 .addToBackStack(null)
                 .commit();
         });
+
+        btnFilterAll = view.findViewById(R.id.btn_filter_all);
+        btnFilterFootball = view.findViewById(R.id.btn_filter_football);
+        btnFilterBasketball = view.findViewById(R.id.btn_filter_basketball);
+        btnFilterVolleyball = view.findViewById(R.id.btn_filter_volleyball);
+
+        btnFilterAll.setOnClickListener(v -> setSportFilter("All"));
+        btnFilterFootball.setOnClickListener(v -> setSportFilter("football"));
+        btnFilterBasketball.setOnClickListener(v -> setSportFilter("basketball"));
+        btnFilterVolleyball.setOnClickListener(v -> setSportFilter("volleyball"));
+        setSportFilter("All");
 
         return view;
     }
@@ -119,7 +136,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         if (userId == null) return;
         FirebaseFirestore.getInstance().collection("users").document(userId)
-            .update("registeredGames", FieldValue.arrayUnion(competition.id))
+            .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
             .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show())
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
@@ -129,7 +146,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         if (userId == null) return;
         FirebaseFirestore.getInstance().collection("users").document(userId)
-            .update("registeredGames", FieldValue.arrayRemove(competition.id))
+            .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
             .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show())
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
@@ -148,6 +165,33 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         for (Competition c : allCompetitions) {
             if (c.name != null && c.name.toLowerCase().contains(query.toLowerCase())) {
                 competitions.add(c);
+            }
+        }
+        adapter.setCompetitions(competitions);
+    }
+
+    private void setSportFilter(String sport) {
+        selectedSport = sport;
+        btnFilterAll.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), sport.equals("All") ? R.color.colorPrimary : R.color.colorSecondary));
+        btnFilterAll.setTextColor(ContextCompat.getColor(requireContext(), sport.equals("All") ? android.R.color.white : R.color.colorPrimary));
+        btnFilterFootball.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), sport.equals("football") ? R.color.colorPrimary : R.color.colorSecondary));
+        btnFilterFootball.setTextColor(ContextCompat.getColor(requireContext(), sport.equals("football") ? android.R.color.white : R.color.colorPrimary));
+        btnFilterBasketball.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), sport.equals("basketball") ? R.color.colorPrimary : R.color.colorSecondary));
+        btnFilterBasketball.setTextColor(ContextCompat.getColor(requireContext(), sport.equals("basketball") ? android.R.color.white : R.color.colorPrimary));
+        btnFilterVolleyball.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), sport.equals("volleyball") ? R.color.colorPrimary : R.color.colorSecondary));
+        btnFilterVolleyball.setTextColor(ContextCompat.getColor(requireContext(), sport.equals("volleyball") ? android.R.color.white : R.color.colorPrimary));
+        filterCompetitionsBySport();
+    }
+
+    private void filterCompetitionsBySport() {
+        competitions.clear();
+        if (selectedSport.equals("All")) {
+            competitions.addAll(allCompetitions);
+        } else {
+            for (Competition c : allCompetitions) {
+                if (c.sport != null && c.sport.equalsIgnoreCase(selectedSport)) {
+                    competitions.add(c);
+                }
             }
         }
         adapter.setCompetitions(competitions);

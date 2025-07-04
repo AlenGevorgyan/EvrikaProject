@@ -65,7 +65,7 @@ public class RegisteredGamesFragment extends Fragment {
                     @Override
                     public void onRemove(Competition competition) {
                         FirebaseFirestore.getInstance().collection("users").document(userId)
-                            .update("registeredGames", FieldValue.arrayRemove(competition.id))
+                            .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
                             .addOnSuccessListener(aVoid -> loadRegisteredGames());
                     }
                     @Override

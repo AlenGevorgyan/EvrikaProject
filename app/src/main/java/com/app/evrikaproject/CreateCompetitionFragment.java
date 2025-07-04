@@ -69,7 +69,7 @@ public class CreateCompetitionFragment extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item,
-                new String[]{"football", "basketball"});
+                new String[]{"football", "basketball", "volleyball"});
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSport.setAdapter(adapter);
 
@@ -186,7 +186,7 @@ public class CreateCompetitionFragment extends Fragment {
                                         "date", selectedDate)
                                 .addOnSuccessListener(aVoid2 -> {
                                     Map<String, Object> competitionData = new HashMap<>();
-                                    competitionData.put("id", compId);
+                                    competitionData.put("posterId", compId);
                                     competitionData.put("name", name);
                                     competitionData.put("sport", sport);
                                     competitionData.put("type", type);

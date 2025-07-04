@@ -12,4 +12,5 @@
     <color name="textColorSecondary">#99000000</color>
     <color name="hintColor">#BABABA</color>
     <color name="logout">#C30000</color>
+    <color name="gradientOrange">#F59E0B</color>
 </resources>

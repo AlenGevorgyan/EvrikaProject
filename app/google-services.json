@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "44676361684",
+    "firebase_url": "https://evrika-backend-default-rtdb.firebaseio.com",
     "project_id": "evrika-backend",
     "storage_bucket": "evrika-backend.firebasestorage.app"
   },

@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
     }
 
     private void loadCompetitions() {
-        db.collection("competitions").get()
+        db.collection("games").get()
             .addOnSuccessListener(this::onCompetitionsLoaded)
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load competitions", Toast.LENGTH_SHORT).show());
     }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44676361684",
+    "project_id": "evrika-backend",
+    "storage_bucket": "evrika-backend.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44676361684:android:5447d2e3d763be19067a41",
+        "android_client_info": {
+          "package_name": "com.app.evrikaproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC44-LPg6hOSmwbd7mGyaRhVaFl7efTdcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

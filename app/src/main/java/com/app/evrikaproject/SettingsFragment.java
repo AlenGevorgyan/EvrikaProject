@@ -40,10 +40,6 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         ivProfileImage = view.findViewById(R.id.iv_profile_image);
-        tilUsername = view.findViewById(R.id.username);
-        tilRealName = view.findViewById(R.id.name);
-        tilRealSurname = view.findViewById(R.id.surname);
-        etUsername = view.findViewById(R.id.et_username);
         etRealName = view.findViewById(R.id.et_real_name);
         etRealSurname = view.findViewById(R.id.et_real_surname);
 
@@ -62,7 +58,6 @@ public class SettingsFragment extends Fragment {
         if (userId == null) return;
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener(doc -> {
-                etUsername.setText(doc.getString("username"));
                 etRealName.setText(doc.getString("realName"));
                 etRealSurname.setText(doc.getString("realSurname"));
                 // TODO: Load image from URL if available

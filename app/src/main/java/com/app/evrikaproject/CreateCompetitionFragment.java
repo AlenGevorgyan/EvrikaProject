@@ -62,10 +62,18 @@ public class CreateCompetitionFragment extends Fragment {
         btnPickLocation = view.findViewById(R.id.btn_pick_location);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_item,
+                R.layout.item_dropdown_black,
                 new String[]{"football", "basketball", "volleyball"});
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.item_dropdown_black);
         spinnerSport.setAdapter(adapter);
+        spinnerSport.setTextColor(getResources().getColor(android.R.color.black));
+        spinnerSport.setOnTouchListener((v, event) -> {
+            if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                spinnerSport.showDropDown();
+                return true;
+            }
+            return false;
+        });
 
         btnPickDate.setOnClickListener(v -> pickDate());
         btnPickTime.setOnClickListener(v -> pickTime());
@@ -73,6 +81,20 @@ public class CreateCompetitionFragment extends Fragment {
         btnPickLocation.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MapPickerActivity.class);
             startActivityForResult(intent, PICK_LOCATION_REQUEST);
+        });
+
+        chipGroupType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == chipPublic.getId()) {
+                chipPublic.setChipBackgroundColorResource(R.color.colorPrimary);
+                chipPublic.setTextColor(getResources().getColor(android.R.color.white));
+                chipPrivate.setChipBackgroundColorResource(android.R.color.darker_gray);
+                chipPrivate.setTextColor(getResources().getColor(android.R.color.black));
+            } else if (checkedId == chipPrivate.getId()) {
+                chipPrivate.setChipBackgroundColorResource(R.color.colorPrimary);
+                chipPrivate.setTextColor(getResources().getColor(android.R.color.white));
+                chipPublic.setChipBackgroundColorResource(android.R.color.darker_gray);
+                chipPublic.setTextColor(getResources().getColor(android.R.color.black));
+            }
         });
 
         return view;
@@ -130,7 +152,15 @@ public class CreateCompetitionFragment extends Fragment {
     private void createCompetition() {
         String name = etName.getText().toString().trim();
         String sport = spinnerSport.getText().toString();
-        String type = chipGroupType.getCheckedChipId() == chipPublic.getId() ? "public" : "private";
+        String type;
+        int checkedId = chipGroupType.getCheckedChipId();
+        if (checkedId == chipPublic.getId()) {
+            type = "public";
+        } else if (checkedId == chipPrivate.getId()) {
+            type = "private";
+        } else {
+            type = "";
+        }
         String teamPlayerCountStr = etTeamPlayerCount.getText().toString().trim();
         int teamPlayerCount = teamPlayerCountStr.isEmpty() ? 0 : Integer.parseInt(teamPlayerCountStr);
 
@@ -178,10 +208,7 @@ public class CreateCompetitionFragment extends Fragment {
         competitionData.put("sport", sport);
         competitionData.put("type", type);
         competitionData.put("posterId", userId);
-        competitionData.put("createdBy", userId);
         competitionData.put("teams", initialPlayers);
-        competitionData.put("invitedTeams", new ArrayList<>());
-        competitionData.put("imageUrl", imageUrl);
         competitionData.put("teamPlayerCount", teamPlayerCount);
         competitionData.put("latitude", selectedLat);
         competitionData.put("longitude", selectedLng);
@@ -197,8 +224,16 @@ public class CreateCompetitionFragment extends Fragment {
                         Log.d("Firestore", "Document uploaded successfully");
                         // Add the host to their own registered games
                         addHostToOwnGame(compId, userId);
-                        // Create chat room for the competition
-                        createChatRoom(compId, name, userId);
+                        // Create an empty 'messages' subcollection under the game document
+                        FirebaseFirestore.getInstance().collection("games").document(compId)
+                            .collection("messages").document("init").set(new HashMap<>())
+                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Messages subcollection initialized"))
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to initialize messages subcollection: " + e.getMessage()));
+                        // Navigate to home (MainActivity)
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        requireActivity().finish();
                     } else {
                         Log.e("Firestore", "Error uploading document: ");
                     }
@@ -213,28 +248,6 @@ public class CreateCompetitionFragment extends Fragment {
             })
             .addOnFailureListener(e -> {
                 Log.e("Firestore", "Failed to add host to own game: " + e.getMessage());
-            });
-    }
-
-    private void createChatRoom(String compId, String competitionName, String userId) {
-        List<String> participantIds = new ArrayList<>();
-        participantIds.add(userId);
-        
-        Map<String, Object> chatRoomData = new HashMap<>();
-        chatRoomData.put("roomId", compId);
-        chatRoomData.put("competitionId", compId);
-        chatRoomData.put("competitionName", competitionName);
-        chatRoomData.put("participantIds", participantIds);
-        chatRoomData.put("lastMessage", "");
-        chatRoomData.put("lastMessageTime", null);
-        
-        FirebaseFirestore.getInstance().collection("chat_rooms").document(compId)
-            .set(chatRoomData)
-            .addOnSuccessListener(aVoid -> {
-                Log.d("Firestore", "Chat room created successfully");
-            })
-            .addOnFailureListener(e -> {
-                Log.e("Firestore", "Failed to create chat room: " + e.getMessage());
             });
     }
 }

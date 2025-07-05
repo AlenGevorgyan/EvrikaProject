@@ -17,14 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Register extends AppCompatActivity {
-    private EditText etUsername, etRealName, etRealSurname, etEmail, etPassword, etConfirmPassword, etAge, etGender;
+    private EditText etRealName, etRealSurname, etEmail, etPassword, etConfirmPassword, etAge, etGender;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        etUsername = findViewById(R.id.username);
         etRealName = findViewById(R.id.name);
         etRealSurname = findViewById(R.id.surname);
         etEmail = findViewById(R.id.email);
@@ -53,17 +52,16 @@ public class Register extends AppCompatActivity {
     }
 
     private void registerUser() {
-        String username = etUsername.getText().toString().trim();
         String realName = etRealName.getText().toString().trim();
+        String realSurname = etRealSurname.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
         String ageStr = etAge.getText().toString().trim();
         String gender = etGender.getText().toString().trim();
-        String realSurname = etRealSurname.getText().toString().trim();
 
         // Basic validation
-        if (username.isEmpty() || realName.isEmpty() || realSurname.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || ageStr.isEmpty() || gender.isEmpty()) {
+        if (realName.isEmpty() || realSurname.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || ageStr.isEmpty() || gender.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -93,7 +91,6 @@ public class Register extends AppCompatActivity {
                                 if (verifyTask.isSuccessful()) {
                                     String uid = firebaseUser.getUid();
                                     Map<String, Object> map = new HashMap<>();
-                                    map.put("username", username);
                                     map.put("name", realName);
                                     map.put("surname", realSurname);
                                     map.put("uid", uid);
@@ -120,28 +117,6 @@ public class Register extends AppCompatActivity {
                     Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-    }
-
-    public static class User {
-        public String uid;
-        public String username;
-        public String realName;
-        public String realSurname;
-        public String email;
-        public int age;
-        public String gender;
-        public List<String> registeredGames;
-        public User() {}
-        public User(String uid, String username, String realName, String realSurname, String email, int age, String gender) {
-            this.uid = uid;
-            this.username = username;
-            this.realSurname = realSurname;
-            this.realName = realName;
-            this.email = email;
-            this.age = age;
-            this.gender = gender;
-            this.registeredGames = new ArrayList<>();
-        }
     }
 
     @Override

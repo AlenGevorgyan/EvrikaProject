@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="5dp"
-                android:text="Username"
+                android:text="Sender"
                 android:textSize="18dp"
                 android:textColor="@color/black"
                 android:textStyle="bold" />
@@ -75,7 +75,6 @@
         android:layout_alignParentEnd="true"
         android:layout_marginStart="80dp"
         android:background="@drawable/my_messages_bkg"
-        android:backgroundTint="@color/colorSecondary"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone">
@@ -105,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="5dp"
-                android:text="Username"
+                android:text="Sender"
                 android:textColor="@color/black"
                 android:textSize="18dp"
                 android:textStyle="bold" />

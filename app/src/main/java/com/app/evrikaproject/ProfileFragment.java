@@ -28,7 +28,7 @@ import android.content.Intent;
 
 public class ProfileFragment extends Fragment {
     private ImageView profileImage;
-    private TextView tvUsername, tvRealName, tvGender, tvAge;
+    private TextView tvRealName, tvGender, tvAge;
     private Button btnPosted, btnRegistered;
     private FrameLayout competitionsContainer;
     private String userId;
@@ -44,7 +44,6 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         profileImage = view.findViewById(R.id.profile_image);
-        tvUsername = view.findViewById(R.id.tv_username);
         tvRealName = view.findViewById(R.id.tv_real_name);
         tvGender = view.findViewById(R.id.tv_gender);
         tvAge = view.findViewById(R.id.tv_age);
@@ -83,13 +82,11 @@ public class ProfileFragment extends Fragment {
 
     private void onUserLoaded(DocumentSnapshot doc) {
         if (doc.exists()) {
-            String username = doc.getString("username");
             String realName = doc.getString("name");
             String realSurname = doc.getString("surname");
             String gender = doc.getString("gender");
             Long ageLong = doc.getLong("age");
             String age = ageLong != null ? "Age: " + String.valueOf(ageLong) : "";
-            tvUsername.setText(username != null ? username : "N/A");
             String fullName = ((realName != null ? realName : "N/A") + " " + (realSurname != null ? realSurname : "")).trim();
             tvRealName.setText(!fullName.trim().isEmpty() ? fullName : "N/A");
             tvGender.setText(gender != null ? "Gender: " + gender : "N/A");

@@ -29,6 +29,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.chip.Chip;
 import androidx.activity.OnBackPressedCallback;
 import android.widget.ImageButton;
+import androidx.cardview.widget.CardView;
 
 public class EditCompetitionActivity extends AppCompatActivity {
     private EditText etName, etDate, etTime, etTeamPlayerCount;
@@ -42,6 +43,10 @@ public class EditCompetitionActivity extends AppCompatActivity {
     private LinearLayout requestsContainer;
     private ChipGroup chipGroupType;
     private Chip chipPublic, chipPrivate;
+    private TextView tvLocation;
+    private MaterialButton btnPickLocation;
+    private double latitude = 0, longitude = 0;
+    private CardView requestsCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +103,15 @@ public class EditCompetitionActivity extends AppCompatActivity {
         chipGroupType = findViewById(R.id.chip_group_type);
         chipPublic = findViewById(R.id.chip_public);
         chipPrivate = findViewById(R.id.chip_private);
+        tvLocation = findViewById(R.id.tv_location);
+        btnPickLocation = findViewById(R.id.btn_pick_location);
+        requestsCard = findViewById(R.id.request_card);
 
         // Setup spinners
-        ArrayAdapter<String> sportAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"football", "basketball", "volleyball"});
-        sportAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> sportAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown_black, new String[]{"football", "basketball", "volleyball"});
+        sportAdapter.setDropDownViewResource(R.layout.item_dropdown_black);
         spinnerSport.setAdapter(sportAdapter);
+        spinnerSport.setTextColor(getResources().getColor(android.R.color.black));
 
         // Setup date picker
         etDate.setOnClickListener(v -> showDatePicker());
@@ -113,6 +122,26 @@ public class EditCompetitionActivity extends AppCompatActivity {
         // Setup buttons
         btnSave.setOnClickListener(v -> saveCompetition());
         btnDelete.setOnClickListener(v -> showDeleteConfirmation());
+        btnPickLocation.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapPickerActivity.class);
+            startActivityForResult(intent, 1023);
+        });
+
+        chipGroupType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == chipPublic.getId()) {
+                chipPublic.setChipBackgroundColorResource(R.color.colorPrimary);
+                chipPublic.setTextColor(getResources().getColor(android.R.color.white));
+                chipPrivate.setChipBackgroundColorResource(android.R.color.darker_gray);
+                chipPrivate.setTextColor(getResources().getColor(android.R.color.black));
+                if (requestsCard != null) requestsCard.setVisibility(View.GONE);
+            } else if (checkedId == chipPrivate.getId()) {
+                chipPrivate.setChipBackgroundColorResource(R.color.colorPrimary);
+                chipPrivate.setTextColor(getResources().getColor(android.R.color.white));
+                chipPublic.setChipBackgroundColorResource(android.R.color.darker_gray);
+                chipPublic.setTextColor(getResources().getColor(android.R.color.black));
+                if (requestsCard != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void loadCompetition() {
@@ -133,6 +162,9 @@ public class EditCompetitionActivity extends AppCompatActivity {
                         etDate.setText(competition.getDate());
                         etTime.setText(competition.getTime());
                         etTeamPlayerCount.setText(String.valueOf(competition.getTeamPlayerCount()));
+                        latitude = competition.getLatitude();
+                        longitude = competition.getLongitude();
+                        tvLocation.setText("Location: Lat: " + latitude + ", Lng: " + longitude);
 
                         // Set spinner selections
                         String sport = competition.getSport();
@@ -150,9 +182,14 @@ public class EditCompetitionActivity extends AppCompatActivity {
                             }
                         }
 
-                        // Show requests if private and host
-                        if ("private".equals(competition.getType()) && currentUserId.equals(competition.getCreatedBy())) {
-                            showRequests();
+                        // Show/hide requests card based on type
+                        if (requestsCard != null) {
+                            if ("private".equals(competition.getType()) && currentUserId.equals(competition.getCreatedBy())) {
+                                requestsCard.setVisibility(View.VISIBLE);
+                                showRequests();
+                            } else {
+                                requestsCard.setVisibility(View.GONE);
+                            }
                         }
                     }
                 } else {
@@ -236,6 +273,8 @@ public class EditCompetitionActivity extends AppCompatActivity {
         competition.setTeamPlayerCount(teamPlayerCount);
         competition.setSport(sport);
         competition.setType(type);
+        competition.setLatitude(latitude);
+        competition.setLongitude(longitude);
 
         db.collection("games").document(competitionId).set(competition)
             .addOnSuccessListener(aVoid -> {
@@ -248,12 +287,18 @@ public class EditCompetitionActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmation() {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
             .setTitle("Delete Competition")
             .setMessage("Are you sure you want to delete this competition? This action cannot be undone.")
-            .setPositiveButton("Delete", (dialog, which) -> deleteCompetition())
+            .setPositiveButton("Delete", (d, which) -> deleteCompetition())
             .setNegativeButton("Cancel", null)
-            .show();
+            .create();
+        dialog.show();
+        TextView messageView = dialog.findViewById(android.R.id.message);
+        if (messageView != null) messageView.setTextColor(getResources().getColor(android.R.color.black));
+        int titleId = getResources().getIdentifier("alertTitle", "id", "android");
+        TextView titleView = dialog.findViewById(titleId);
+        if (titleView != null) titleView.setTextColor(getResources().getColor(android.R.color.black));
     }
 
     private void deleteCompetition() {
@@ -292,8 +337,10 @@ public class EditCompetitionActivity extends AppCompatActivity {
             // Fetch username from Firestore
             com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("users").document(requesterId).get()
                 .addOnSuccessListener(userDoc -> {
-                    String username = userDoc.getString("username");
-                    tv.setText(username != null ? username : requesterId);
+                    String realName = userDoc.getString("name");
+                    String realSurname = userDoc.getString("surname");
+                    String displayName = (realName != null ? realName : "") + (realSurname != null ? " " + realSurname : "");
+                    tv.setText(!displayName.trim().isEmpty() ? displayName.trim() : requesterId);
                 })
                 .addOnFailureListener(e -> tv.setText(requesterId));
             // Add margin to the right of the username
@@ -362,5 +409,15 @@ public class EditCompetitionActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1023 && resultCode == RESULT_OK && data != null) {
+            latitude = data.getDoubleExtra("lat", 0);
+            longitude = data.getDoubleExtra("lng", 0);
+            tvLocation.setText("Location: Lat: " + latitude + ", Lng: " + longitude);
+        }
     }
 } 

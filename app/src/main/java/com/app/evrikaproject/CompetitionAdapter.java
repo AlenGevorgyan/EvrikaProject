@@ -52,7 +52,6 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         holder.tvSport.setText(comp.sport != null ? comp.sport : "");
         holder.tvDate.setText(comp.date != null ? comp.date + " : " + comp.time : "");
         holder.tvPlayerCount.setText("Players: " + (comp.teamPlayerCount > 0 ? comp.teamPlayerCount : "N/A"));
-        holder.tvLocation.setText("Location: Stadium"); // Static location for now
         // Set background image based on sport
         if (comp.sport != null && comp.sport.equalsIgnoreCase("football")) {
             holder.bgSportImage.setImageResource(R.drawable.football);
@@ -179,33 +178,36 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
 
 
     private void showDeleteConfirmation(Competition competition) {
-        new androidx.appcompat.app.AlertDialog.Builder(context)
-            .setTitle("Delete Competition")
-            .setMessage("Are you sure you want to delete this competition? This action cannot be undone.")
-            .setPositiveButton("Delete", (dialog, which) -> {
-                // Delete the competition
-                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                    .collection("games").document(competition.posterId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        // Also delete the chat room
-                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                            .collection("chat_rooms").document(competition.posterId)
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Delete Competition")
+                .setMessage("Are you sure you want to delete this competition? This action cannot be undone.")
+                .setPositiveButton("Delete", (dialogInterface, which) -> {
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("games").document(competition.posterId)
                             .delete()
-                            .addOnSuccessListener(aVoid2 -> {
-                                android.widget.Toast.makeText(context, "Competition deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
+                            .addOnSuccessListener(aVoid -> {
+                                com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                        .collection("chat_rooms").document(competition.posterId)
+                                        .delete()
+                                        .addOnSuccessListener(aVoid2 -> {
+                                            android.widget.Toast.makeText(context, "Competition deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            android.widget.Toast.makeText(context, "Competition deleted but failed to delete chat room", android.widget.Toast.LENGTH_SHORT).show();
+                                        });
                             })
                             .addOnFailureListener(e -> {
-                                android.widget.Toast.makeText(context, "Competition deleted but failed to delete chat room", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(context, "Failed to delete competition: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
                             });
-                    })
-                    .addOnFailureListener(e -> {
-                        android.widget.Toast.makeText(context, "Failed to delete competition: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
-                    });
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+
+        // ✅ Change button text colors AFTER show()
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.RED);     // Delete in red
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.GRAY);    // Cancel in gray
     }
+
 
     static class CompetitionViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvSport, tvDate, tvPlayerCount, tvLocation;

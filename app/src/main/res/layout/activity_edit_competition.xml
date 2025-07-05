@@ -206,11 +206,31 @@
                             android:textColor="@color/black"
                             android:textSize="16sp"/>
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Place/Location -->
+                    <TextView
+                        android:id="@+id/tv_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Location: "
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_pick_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Change Location"
+                        android:textColor="@color/white"
+                        android:backgroundTint="@color/colorPrimary"
+                        app:cornerRadius="12dp"
+                        android:layout_marginBottom="16dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Requests Container for private games -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/request_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"

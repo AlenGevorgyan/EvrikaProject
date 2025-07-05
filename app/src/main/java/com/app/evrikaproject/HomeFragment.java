@@ -52,9 +52,6 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                         registeredGames.add(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
-                        
-                        // Add user to chat room
-                        addUserToChatRoom(competition.posterId, competition.name, FirebaseAuth.getInstance().getUid());
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -67,9 +64,6 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                         registeredGames.remove(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
-                        
-                        // Remove user from chat room
-                        removeUserFromChatRoom(competition.posterId, FirebaseAuth.getInstance().getUid());
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -162,8 +156,6 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
-                // Add user to chat room
-                addUserToChatRoom(competition.posterId, competition.name, userId);
                 // Refresh the list
                 loadUserRegisteredGames(userId);
             })
@@ -178,8 +170,6 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
-                // Remove user from chat room
-                removeUserFromChatRoom(competition.posterId, userId);
                 // Refresh the list
                 loadUserRegisteredGames(userId);
             })
@@ -230,37 +220,6 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             }
         }
         adapter.setCompetitions(competitions);
-    }
-
-    private void addUserToChatRoom(String competitionId, String competitionName, String userId) {
-        if (userId == null) return;
-        
-        db.collection("chat_rooms").document(competitionId).get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Update existing chat room
-                    documentSnapshot.getReference().update("participantIds", FieldValue.arrayUnion(userId));
-                } else {
-                    // Create new chat room
-                    List<String> participantIds = new ArrayList<>();
-                    participantIds.add(userId);
-                    
-                    ChatRoom chatRoom = new ChatRoom(competitionId, competitionId, competitionName, participantIds);
-                    db.collection("chat_rooms").document(competitionId).set(chatRoom);
-                }
-            });
-    }
-
-    private void removeUserFromChatRoom(String competitionId, String userId) {
-        if (userId == null) return;
-        
-        db.collection("chat_rooms").document(competitionId).get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Remove user from chat room
-                    documentSnapshot.getReference().update("participantIds", FieldValue.arrayRemove(userId));
-                }
-            });
     }
 
     // Simple details fragment for demonstration

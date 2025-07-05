@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_gradient_orange"
     android:padding="16dp">
 
@@ -26,7 +27,7 @@
                 android:layout_height="32dp"
                 android:src="@drawable/ic_add"
                 app:tint="@color/colorPrimary"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -34,7 +35,7 @@
                 android:text="Create New Competition"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <!-- Competition Details Card -->
@@ -64,7 +65,7 @@
                         android:layout_width="4dp"
                         android:layout_height="24dp"
                         android:background="@color/colorPrimary"
-                        android:layout_marginEnd="12dp"/>
+                        android:layout_marginEnd="12dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -72,7 +73,7 @@
                         android:text="Competition Details"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/textColorPrimary"/>
+                        android:textColor="@color/textColorPrimary" />
                 </LinearLayout>
 
                 <!-- Competition Name -->
@@ -81,7 +82,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:hint="Competition Name"
-                    app:hintTextColor="@color/black"
                     app:boxStrokeColor="@color/colorPrimary"
                     app:boxStrokeWidth="2dp"
                     app:boxCornerRadiusTopStart="12dp"
@@ -97,33 +97,30 @@
                         android:inputType="textPersonName"
                         android:textColor="@color/black"
                         android:textColorHint="@color/gray"
-                        android:hint="Competition Name"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Sport Type Spinner -->
+                <!-- Sport Spinner -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
                     android:hint="Select Sport"
-                    app:hintTextColor="@color/black"
-                    app:boxStrokeColor="@color/colorPrimary"
-                    app:boxStrokeWidth="2dp"
+                    android:layout_marginTop="8dp"
                     app:boxCornerRadiusTopStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                    app:boxStrokeColor="@color/black"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <AutoCompleteTextView
                         android:id="@+id/create_spinner_sport"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Select Sport"
-                        android:textColor="@color/black"
+                        android:layout_height="48dp"
                         android:inputType="none"
-                        android:textSize="16sp"/>
+                        android:paddingLeft="15dp"
+                        android:textColorHint="@color/black"
+                        android:textColor="@color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Competition Type -->
@@ -134,7 +131,8 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/textColorPrimary"
-                    android:layout_marginBottom="12dp"/>
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/rg_type"
@@ -153,7 +151,7 @@
                         app:chipBackgroundColor="@color/colorPrimary"
                         app:chipStrokeColor="@color/colorPrimary"
                         app:chipStrokeWidth="2dp"
-                        app:checkedIconVisible="false"/>
+                        app:checkedIconVisible="false" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/rb_private"
@@ -164,7 +162,7 @@
                         app:chipBackgroundColor="@color/colorPrimary"
                         app:chipStrokeColor="@color/colorPrimary"
                         app:chipStrokeWidth="2dp"
-                        app:checkedIconVisible="false"/>
+                        app:checkedIconVisible="false" />
                 </com.google.android.material.chip.ChipGroup>
 
                 <!-- Team Player Count -->
@@ -172,7 +170,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Team Player Count"
-                    app:hintTextColor="@color/black"
                     app:boxStrokeColor="@color/colorPrimary"
                     app:boxStrokeWidth="2dp"
                     app:boxCornerRadiusTopStart="12dp"
@@ -185,11 +182,10 @@
                         android:id="@+id/et_team_player_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Team Player Count"
-                        android:textColorHint="@color/gray"
                         android:inputType="number"
+                        android:textColorHint="@color/gray"
                         android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

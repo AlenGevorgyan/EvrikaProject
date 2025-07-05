@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private ChatAdapterSimple adapter;
+    private ChatAdapter adapter;
     private EditText etMessage;
     private MaterialButton btnSend;
     private List<ChatMessage> messages = new ArrayList<>();
@@ -92,15 +92,12 @@ public class ChatActivity extends AppCompatActivity {
                         // Try different possible field names for user name
                         String realName = documentSnapshot.getString("name");
                         String realSurname = documentSnapshot.getString("surname");
-                        String username = documentSnapshot.getString("username");
                         
-                        // Combine real name and surname, or use username as fallback
+                        // Combine real name and surname, or use Anonymous as fallback
                         if (realName != null && !realName.isEmpty() && realSurname != null && !realSurname.isEmpty()) {
                             currentUserName = realName + " " + realSurname;
                         } else if (realName != null && !realName.isEmpty()) {
                             currentUserName = realName;
-                        } else if (username != null && !username.isEmpty()) {
-                            currentUserName = username;
                         } else {
                             currentUserName = "Anonymous";
                         }
@@ -125,7 +122,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         // Temporarily use simple adapter for testing
-        adapter = new ChatAdapterSimple(this, messages);
+        adapter = new ChatAdapter(this, messages, currentUserId);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
@@ -164,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
                             messages.add(message);
                         }
                     }
-                    ((ChatAdapterSimple) adapter).setMessages(messages);
+                    adapter.setMessages(messages);
                     scrollToBottom();
                     
                     // Debug info

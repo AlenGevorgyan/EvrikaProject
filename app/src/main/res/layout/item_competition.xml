@@ -81,14 +81,64 @@
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <Button
-                android:id="@+id/btn_view_details"
-                android:layout_width="wrap_content"
+            <!-- Button Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Join now"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@android:color/holo_green_light"
-                android:textColor="@android:color/white"/>
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <!-- Join/Chat Button -->
+                <Button
+                    android:id="@+id/btn_view_details"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Join now"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="@android:color/holo_green_light"
+                    android:textColor="@android:color/white"/>
+
+                <!-- Leave Button (for registered games) -->
+                <Button
+                    android:id="@+id/btn_leave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Leave"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="@color/logout"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
+                <!-- Edit Button (for host) -->
+                <Button
+                    android:id="@+id/btn_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
+                <!-- Delete Button (for host) -->
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Delete"
+                    android:layout_marginStart="4dp"
+                    android:backgroundTint="@color/logout"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 

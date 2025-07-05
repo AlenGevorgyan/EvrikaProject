@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -24,6 +25,21 @@ public class Login extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_login);
+        
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Login");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
+        // Add click listener to toolbar navigation icon as backup
+        toolbar.setNavigationOnClickListener(v -> {
+            android.util.Log.d("Login", "Toolbar navigation clicked");
+            finish();
+        });
+        
         etEmail = findViewById(R.id.email);
         etPassword = findViewById(R.id.password);
         registerTV = findViewById(R.id.registerNow);
@@ -60,5 +76,14 @@ public class Login extends AppCompatActivity {
                         Toast.makeText(this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

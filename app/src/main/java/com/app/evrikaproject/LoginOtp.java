@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.app.evrikaproject.MainActivity;
 import com.app.evrikaproject.R;
@@ -29,6 +30,20 @@ public class LoginOtp extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_otp);
+
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Email Verification");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
+        // Add click listener to toolbar navigation icon as backup
+        toolbar.setNavigationOnClickListener(v -> {
+            android.util.Log.d("LoginOtp", "Toolbar navigation clicked");
+            finish();
+        });
 
         verifyOtpButton = findViewById(R.id.btn_verify_otp);
         resendLinkButton = findViewById(R.id.resendLinkButton);
@@ -117,5 +132,14 @@ public class LoginOtp extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

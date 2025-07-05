@@ -66,7 +66,11 @@ public class ProfileFragment extends Fragment {
         });
         btnRegistered.setOnClickListener(v -> {
             setButtonSelected(false);
-            showRegisteredCompetitions();
+            loadUserRegisteredGames();
+            // Add a small delay to ensure registered games are loaded
+            new android.os.Handler().postDelayed(() -> {
+                showRegisteredCompetitions();
+            }, 500);
         });
         btnSettings.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MainSettingsActivity.class);
@@ -81,8 +85,8 @@ public class ProfileFragment extends Fragment {
     private void onUserLoaded(DocumentSnapshot doc) {
         if (doc.exists()) {
             String username = doc.getString("username");
-            String realName = doc.getString("realName");
-            String realSurname = doc.getString("realSurname");
+            String realName = doc.getString("name");
+            String realSurname = doc.getString("surname");
             String gender = doc.getString("gender");
             Long ageLong = doc.getLong("age");
             String age = ageLong != null ? "Age: " + String.valueOf(ageLong) : "";
@@ -96,16 +100,40 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    private void loadUserRegisteredGames() {
+        if (userId == null) return;
+        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+            .addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    registeredGames = (List<String>) doc.get("registeredGames");
+                    if (registeredGames == null) registeredGames = new ArrayList<>();
+                    android.util.Log.d("ProfileFragment", "Loaded registered games: " + registeredGames.size());
+                }
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e("ProfileFragment", "Error loading registered games: " + e.getMessage());
+                registeredGames = new ArrayList<>();
+            });
+    }
+
     private void showPostedCompetitions() {
-        FirebaseFirestore.getInstance().collection("competitions")
+        FirebaseFirestore.getInstance().collection("games")
             .whereEqualTo("createdBy", userId)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 postedCompetitions.clear();
+                // Create a list of posted game IDs to pass to adapter
+                List<String> postedGameIds = new ArrayList<>();
+                
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
                     Competition comp = doc.toObject(Competition.class);
-                    postedCompetitions.add(comp);
+                    if (comp != null) {
+                        comp.posterId = doc.getId(); // Set the document ID as posterId
+                        postedCompetitions.add(comp);
+                        postedGameIds.add(doc.getId()); // Add to posted game IDs list
+                    }
                 }
+                
                 RecyclerView recyclerView = new RecyclerView(getContext());
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 postedAdapter = new CompetitionAdapter(getContext(), postedCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
@@ -115,7 +143,11 @@ public class ProfileFragment extends Fragment {
                     public void onRemove(Competition competition) {}
                     @Override
                     public void onViewDetails(Competition competition) {}
-                }, userId, false);
+                }, userId, true); // Set to true so posted games show as registered
+                
+                // Set the posted game IDs so adapter knows these are games the user is part of
+                postedAdapter.setRegisteredGameIds(postedGameIds);
+                
                 competitionsContainer.removeAllViews();
                 recyclerView.setAdapter(postedAdapter);
                 competitionsContainer.addView(recyclerView);
@@ -131,34 +163,60 @@ public class ProfileFragment extends Fragment {
             competitionsContainer.addView(tv);
             return;
         }
-        FirebaseFirestore.getInstance().collection("competitions")
-            .whereIn(FieldPath.of("id"), registeredGames)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                registeredCompetitions.clear();
-                for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                    Competition comp = doc.toObject(Competition.class);
-                    registeredCompetitions.add(comp);
-                }
-                RecyclerView recyclerView = new RecyclerView(getContext());
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                registeredAdapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
-                    @Override
-                    public void onJoin(Competition competition) {}
-                    @Override
-                    public void onRemove(Competition competition) {
-                        if (userId == null) return;
-                        FirebaseFirestore.getInstance().collection("users").document(userId)
-                            .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
-                            .addOnSuccessListener(aVoid -> showRegisteredCompetitions());
+        
+        // Add error handling and debugging
+        try {
+            FirebaseFirestore.getInstance().collection("games")
+                .whereIn(FieldPath.documentId(), registeredGames)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    registeredCompetitions.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Competition comp = doc.toObject(Competition.class);
+                        if (comp != null) {
+                            comp.posterId = doc.getId(); // Set the document ID as posterId
+                            registeredCompetitions.add(comp);
+                        }
                     }
-                    @Override
-                    public void onViewDetails(Competition competition) {}
-                }, userId, true);
-                recyclerView.setAdapter(registeredAdapter);
-                competitionsContainer.removeAllViews();
-                competitionsContainer.addView(recyclerView);
-            });
+                    RecyclerView recyclerView = new RecyclerView(getContext());
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    registeredAdapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
+                        @Override
+                        public void onJoin(Competition competition) {}
+                        @Override
+                        public void onRemove(Competition competition) {
+                            if (userId == null) return;
+                            FirebaseFirestore.getInstance().collection("users").document(userId)
+                                .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
+                                .addOnSuccessListener(aVoid -> {
+                                    // Refresh the registered games list
+                                    loadUserRegisteredGames();
+                                    showRegisteredCompetitions();
+                                });
+                        }
+                        @Override
+                        public void onViewDetails(Competition competition) {}
+                    }, userId, true);
+                    recyclerView.setAdapter(registeredAdapter);
+                    competitionsContainer.removeAllViews();
+                    competitionsContainer.addView(recyclerView);
+                })
+                .addOnFailureListener(e -> {
+                    // Show error message
+                    competitionsContainer.removeAllViews();
+                    TextView tv = new TextView(getContext());
+                    tv.setText("Error loading competitions: " + e.getMessage());
+                    tv.setTextSize(18);
+                    competitionsContainer.addView(tv);
+                });
+        } catch (Exception e) {
+            // Show error message
+            competitionsContainer.removeAllViews();
+            TextView tv = new TextView(getContext());
+            tv.setText("Error: " + e.getMessage());
+            tv.setTextSize(18);
+            competitionsContainer.addView(tv);
+        }
     }
 
     private void setButtonSelected(boolean postedSelected) {

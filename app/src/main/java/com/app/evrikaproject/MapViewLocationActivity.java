@@ -3,6 +3,7 @@ package com.app.evrikaproject;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import org.maplibre.android.geometry.LatLng;
 import org.maplibre.android.maps.MapLibreMap;
 import org.maplibre.android.maps.MapView;
@@ -17,6 +18,20 @@ public class MapViewLocationActivity extends AppCompatActivity implements OnMapR
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_view_location);
+        
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
+        // Add click listener to toolbar navigation icon as backup
+        toolbar.setNavigationOnClickListener(v -> {
+            android.util.Log.d("MapViewLocationActivity", "Toolbar navigation clicked");
+            finish();
+        });
+        
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         lat = getIntent().getDoubleExtra("lat", 0);
@@ -40,4 +55,13 @@ public class MapViewLocationActivity extends AppCompatActivity implements OnMapR
     @Override public void onLowMemory() { mapView.onLowMemory(); super.onLowMemory(); }
     @Override protected void onDestroy() { mapView.onDestroy(); super.onDestroy(); }
     @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState); mapView.onSaveInstanceState(outState); }
+    
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 } 

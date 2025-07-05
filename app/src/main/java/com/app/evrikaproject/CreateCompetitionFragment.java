@@ -1,13 +1,9 @@
 package com.app.evrikaproject;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,42 +14,31 @@ import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FieldValue;
 
-import org.maplibre.android.camera.CameraPosition;
-import org.maplibre.android.camera.CameraUpdateFactory;
-import org.maplibre.android.geometry.LatLng;
-import org.maplibre.android.maps.MapView;
-import org.maplibre.android.maps.Style;
-import org.maplibre.android.annotations.MarkerOptions;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CreateCompetitionFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int FINE_PERMISSION_CODE = 1;
     private static final int PICK_LOCATION_REQUEST = 102;
     private ImageView ivMainImage;
-    private Button btnPickImage, btnPickDate, btnCreate, btnPickLocation;
+    private MaterialButton btnPickImage, btnPickDate, btnPickTime, btnCreate, btnPickLocation;
     private EditText etName, etTeamPlayerCount;
     private Spinner spinnerSport;
     private RadioGroup rgType;
-    private TextView tvLocation, tvDate;
+    private TextView tvLocation, tvDate, tvTime;
     private Uri imageUri;
     private String selectedDate = "";
+    private String selectedTime = "";
     private double selectedLat = 0, selectedLng = 0;
-    private Location currentLocation;
-    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Nullable
     @Override
@@ -66,6 +51,8 @@ public class CreateCompetitionFragment extends Fragment {
         tvLocation = view.findViewById(R.id.tv_location);
         btnPickDate = view.findViewById(R.id.btn_pick_date);
         tvDate = view.findViewById(R.id.tv_date);
+        btnPickTime = view.findViewById(R.id.btn_pick_time);
+        tvTime = view.findViewById(R.id.tv_time);
         btnCreate = view.findViewById(R.id.btn_create_competition);
         btnPickLocation = view.findViewById(R.id.btn_pick_location);
 
@@ -76,6 +63,7 @@ public class CreateCompetitionFragment extends Fragment {
         spinnerSport.setAdapter(adapter);
 
         btnPickDate.setOnClickListener(v -> pickDate());
+        btnPickTime.setOnClickListener(v -> pickTime());
         btnCreate.setOnClickListener(v -> createCompetition());
         btnPickLocation.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MapPickerActivity.class);
@@ -85,21 +73,40 @@ public class CreateCompetitionFragment extends Fragment {
         return view;
     }
 
-    private void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
     private void pickDate() {
         final Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
-            calendar.set(year, month, dayOfMonth);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            selectedDate = sdf.format(calendar.getTime());
-            tvDate.setText(selectedDate);
-            tvDate.setError(null);
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                requireContext(),
+                R.style.MyDatePickerDialogTheme,
+                (view, year, month, dayOfMonth) -> {
+                    calendar.set(year, month, dayOfMonth);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    selectedDate = sdf.format(calendar.getTime());
+                    tvDate.setText(selectedDate);
+                    tvDate.setError(null);
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
         datePickerDialog.show();
+    }
+
+    private void pickTime() {
+        final Calendar calendar = Calendar.getInstance();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                requireContext(),
+                R.style.MyTimePickerDialogTheme, // Use your custom style, or android.R.style.Theme_Holo_Light_Dialog_NoActionBar
+                (view, hourOfDay, minute) -> {
+                    selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
+                    tvTime.setText(selectedTime);
+                    tvTime.setError(null);
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true // is24HourView
+        );
+        timePickerDialog.show();
     }
 
     @Override
@@ -107,12 +114,7 @@ public class CreateCompetitionFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == requireActivity().RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), imageUri);
-                ivMainImage.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // Set your image to ivMainImage here if you use it
         } else if (requestCode == PICK_LOCATION_REQUEST && resultCode == getActivity().RESULT_OK && data != null) {
             selectedLat = data.getDoubleExtra("lat", 0);
             selectedLng = data.getDoubleExtra("lng", 0);
@@ -141,6 +143,10 @@ public class CreateCompetitionFragment extends Fragment {
             tvDate.setError("Pick a date");
             hasError = true;
         }
+        if (selectedTime.isEmpty()) {
+            tvTime.setError("Pick a time");
+            hasError = true;
+        }
         if (type.isEmpty()) {
             Toast.makeText(getContext(), "Select competition type", Toast.LENGTH_SHORT).show();
             hasError = true;
@@ -167,7 +173,8 @@ public class CreateCompetitionFragment extends Fragment {
         competitionData.put("name", name);
         competitionData.put("sport", sport);
         competitionData.put("type", type);
-        competitionData.put("posterId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        competitionData.put("posterId", userId);
+        competitionData.put("createdBy", userId);
         competitionData.put("teams", initialPlayers);
         competitionData.put("invitedTeams", new ArrayList<>());
         competitionData.put("imageUrl", imageUrl);
@@ -175,6 +182,7 @@ public class CreateCompetitionFragment extends Fragment {
         competitionData.put("latitude", selectedLat);
         competitionData.put("longitude", selectedLng);
         competitionData.put("date", selectedDate);
+        competitionData.put("time", selectedTime);
 
         CollectionReference reference = FirebaseFirestore.getInstance().collection("games");
 
@@ -182,12 +190,46 @@ public class CreateCompetitionFragment extends Fragment {
                 .addOnCompleteListener(toFirebase -> {
                     if (toFirebase.isSuccessful()) {
                         Log.d("Firestore", "Document uploaded successfully");
-
+                        // Add the host to their own registered games
+                        addHostToOwnGame(compId, userId);
+                        // Create chat room for the competition
+                        createChatRoom(compId, name, userId);
                     } else {
                         Log.e("Firestore", "Error uploading document: ");
-
                     }
-
                 });
+    }
+
+    private void addHostToOwnGame(String compId, String userId) {
+        FirebaseFirestore.getInstance().collection("users").document(userId)
+            .update("registeredGames", FieldValue.arrayUnion(compId))
+            .addOnSuccessListener(aVoid -> {
+                Log.d("Firestore", "Host added to own game successfully");
+            })
+            .addOnFailureListener(e -> {
+                Log.e("Firestore", "Failed to add host to own game: " + e.getMessage());
+            });
+    }
+
+    private void createChatRoom(String compId, String competitionName, String userId) {
+        List<String> participantIds = new ArrayList<>();
+        participantIds.add(userId);
+        
+        Map<String, Object> chatRoomData = new HashMap<>();
+        chatRoomData.put("roomId", compId);
+        chatRoomData.put("competitionId", compId);
+        chatRoomData.put("competitionName", competitionName);
+        chatRoomData.put("participantIds", participantIds);
+        chatRoomData.put("lastMessage", "");
+        chatRoomData.put("lastMessageTime", null);
+        
+        FirebaseFirestore.getInstance().collection("chat_rooms").document(compId)
+            .set(chatRoomData)
+            .addOnSuccessListener(aVoid -> {
+                Log.d("Firestore", "Chat room created successfully");
+            })
+            .addOnFailureListener(e -> {
+                Log.e("Firestore", "Failed to create chat room: " + e.getMessage());
+            });
     }
 }

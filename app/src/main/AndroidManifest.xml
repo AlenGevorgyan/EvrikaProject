@@ -35,6 +35,8 @@
         <activity android:name=".MainSettingsActivity"/>
         <activity android:name=".MapPickerActivity"/>
         <activity android:name=".MapViewLocationActivity"/>
+        <activity android:name=".ChatActivity"/>
+        <activity android:name=".EditCompetitionActivity"/>
     </application>
 
 </manifest>

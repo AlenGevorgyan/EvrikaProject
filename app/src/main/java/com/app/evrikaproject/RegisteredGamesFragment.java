@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FieldPath;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,67 +21,120 @@ public class RegisteredGamesFragment extends Fragment {
     private RecyclerView recyclerView;
     private CompetitionAdapter adapter;
     private List<Competition> registeredCompetitions = new ArrayList<>();
-    private List<String> registeredGames = new ArrayList<>();
     private String userId;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_registered_games, container, false);
         recyclerView = view.findViewById(R.id.recycler_competitions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        
+        // Initialize adapter first
+        adapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
+            @Override
+            public void onJoin(Competition competition) {
+                // Not applicable for registered games
+            }
+            @Override
+            public void onRemove(Competition competition) {
+                if (userId != null && competition.posterId != null) {
+                    FirebaseFirestore.getInstance().collection("users").document(userId)
+                        .update("registeredGames", com.google.firebase.firestore.FieldValue.arrayRemove(competition.posterId))
+                        .addOnSuccessListener(aVoid -> {
+                            registeredCompetitions.remove(competition);
+                            adapter.notifyDataSetChanged();
+                            if (registeredCompetitions.isEmpty()) {
+                                showEmpty();
+                            }
+                        });
+                }
+            }
+            @Override
+            public void onViewDetails(Competition competition) {
+                // Handle view details if needed
+            }
+        }, userId, true);
+        recyclerView.setAdapter(adapter);
+        
         loadRegisteredGames();
         return view;
     }
 
     private void loadRegisteredGames() {
-        if (userId == null) return;
+        if (userId == null) {
+            showEmpty();
+            return;
+        }
+        
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener(doc -> {
-                registeredGames = (List<String>) doc.get("registeredGames");
-                if (registeredGames == null || registeredGames.isEmpty()) {
-                    showEmpty();
+                if (doc.exists()) {
+                    List<String> registeredGameIds = (List<String>) doc.get("registeredGames");
+                    if (registeredGameIds == null || registeredGameIds.isEmpty()) {
+                        showEmpty();
+                    } else {
+                        loadCompetitions(registeredGameIds);
+                    }
                 } else {
-                    loadCompetitions();
+                    showEmpty();
                 }
+            })
+            .addOnFailureListener(e -> {
+                showEmpty();
             });
     }
 
-    private void loadCompetitions() {
-        FirebaseFirestore.getInstance().collection("competitions")
-            .whereIn(FieldPath.of("id"), registeredGames)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                registeredCompetitions.clear();
-                for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                    Competition comp = doc.toObject(Competition.class);
-                    registeredCompetitions.add(comp);
-                }
-                adapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
-                    @Override
-                    public void onJoin(Competition competition) {}
-                    @Override
-                    public void onRemove(Competition competition) {
-                        FirebaseFirestore.getInstance().collection("users").document(userId)
-                            .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
-                            .addOnSuccessListener(aVoid -> loadRegisteredGames());
+    private void loadCompetitions(List<String> registeredGameIds) {
+        if (registeredGameIds.isEmpty()) {
+            showEmpty();
+            return;
+        }
+        
+        try {
+            FirebaseFirestore.getInstance().collection("games")
+                .whereIn(FieldPath.documentId(), registeredGameIds)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    registeredCompetitions.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Competition comp = doc.toObject(Competition.class);
+                        if (comp != null) {
+                            comp.posterId = doc.getId(); // Set the document ID as posterId
+                            registeredCompetitions.add(comp);
+                        }
                     }
-                    @Override
-                    public void onViewDetails(Competition competition) {}
-                }, userId, true);
-                recyclerView.setAdapter(adapter);
-            });
+                    
+                    if (registeredCompetitions.isEmpty()) {
+                        showEmpty();
+                    } else {
+                        adapter.setCompetitions(registeredCompetitions);
+                        adapter.notifyDataSetChanged();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("RegisteredGamesFragment", "Error loading competitions: " + e.getMessage());
+                    showEmpty();
+                });
+        } catch (Exception e) {
+            android.util.Log.e("RegisteredGamesFragment", "Exception loading competitions: " + e.getMessage());
+            showEmpty();
+        }
     }
 
     private void showEmpty() {
-        recyclerView.setAdapter(null);
         if (getView() != null) {
-            ((ViewGroup) recyclerView.getParent()).removeAllViews();
+            ViewGroup parent = (ViewGroup) recyclerView.getParent();
+            parent.removeAllViews();
+            
             TextView tv = new TextView(getContext());
-            tv.setText("No registered competitions.");
+            tv.setText("No registered competitions found.");
             tv.setTextSize(18);
-            ((ViewGroup) getView()).addView(tv);
+            tv.setPadding(32, 32, 32, 32);
+            tv.setGravity(android.view.Gravity.CENTER);
+            
+            parent.addView(tv);
         }
     }
 } 

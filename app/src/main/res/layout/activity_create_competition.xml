@@ -2,6 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="14dp">
 
     <LinearLayout
@@ -11,22 +13,37 @@
         android:background="@android:color/white"
         android:padding="16dp">
 
+        <!-- Competition Name Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Competition Details"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/textColorPrimary"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"/>
+
         <EditText
             android:id="@+id/et_competition_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Competition Name"
             android:inputType="textPersonName"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:textColor="@android:color/black"
-            android:backgroundTint="@color/colorSecondary"/>
+            android:background="@drawable/edittext_white"
+            android:padding="16dp"
+            android:textSize="16sp"/>
 
         <Spinner
             android:id="@+id/spinner_sport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/colorSecondary"/>
+            android:background="@drawable/edittext_white"
+            android:padding="16dp"
+            android:popupBackground="@color/white"/>
 
         <RadioGroup
             android:id="@+id/rg_type"
@@ -35,21 +52,19 @@
             android:orientation="horizontal"
             android:layout_marginTop="16dp">
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rb_public"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Public"
-                android:checked="true"
-                android:textColor="@android:color/black"/>
+                android:checked="true"/>
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rb_private"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Private"
-                android:layout_marginStart="24dp"
-                android:textColor="@android:color/black"/>
+                android:layout_marginStart="24dp"/>
         </RadioGroup>
 
         <!-- Team Player Count -->
@@ -61,14 +76,30 @@
             android:inputType="number"
             android:layout_marginTop="16dp"
             android:textColor="@android:color/black"
-            android:backgroundTint="@color/colorSecondary"/>
+            android:background="@drawable/edittext_white"
+            android:padding="16dp"
+            android:textSize="16sp"/>
+
+        <!-- Location Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/textColorPrimary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
 
         <!-- Place on Map (now shows picked lat/lng) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/edittext_white"
+            android:padding="12dp">
             <TextView
                 android:id="@+id/tv_location"
                 android:layout_width="0dp"
@@ -78,7 +109,8 @@
                 android:paddingStart="16dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@android:color/black"/>
+                android:textColor="@color/hintColor"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -91,41 +123,131 @@
             android:backgroundTint="@color/colorPrimary"
             android:textColor="@color/white"/>
 
-        <!-- Date -->
+        <!-- Date Picker Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Competition Date"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/textColorPrimary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/edittext_white"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/date_picker_container">
 
-            <Button
-                android:id="@+id/btn_pick_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@color/colorPrimary"
-                android:text="Pick Date" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_calendar"
+                app:tint="@color/colorPrimary"
+                android:layout_marginEnd="12dp"/>
 
             <TextView
                 android:id="@+id/tv_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
+                android:text="Select competition date"
+                android:textColor="@color/hintColor"
+                android:textSize="16sp"
+                android:paddingStart="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_pick_date"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="SELECT"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/colorPrimary"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
                 android:paddingStart="16dp"
-                android:text="No date selected"
-                android:textColor="@android:color/black" />
+                android:paddingEnd="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                style="@style/Widget.MaterialComponents.Button"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_create_competition"
+        <!-- Time Picker Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Competition Time"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/textColorPrimary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/edittext_white"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:id="@+id/time_picker_container">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_time"
+                app:tint="@color/colorPrimary"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select competition time"
+                android:textColor="@color/hintColor"
+                android:textSize="16sp"
+                android:paddingStart="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_pick_time"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="SELECT"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/colorPrimary"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create_competition"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
             android:text="Create Competition"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/colorPrimary"
-            android:layout_marginTop="32dp" />
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.Button" />
     </LinearLayout>
-</ScrollView> 
+</ScrollView>

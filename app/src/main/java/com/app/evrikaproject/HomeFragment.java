@@ -52,6 +52,9 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                         registeredGames.add(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                        
+                        // Add user to chat room
+                        addUserToChatRoom(competition.posterId, competition.name, FirebaseAuth.getInstance().getUid());
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -64,6 +67,9 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                         registeredGames.remove(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
                         Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                        
+                        // Remove user from chat room
+                        removeUserFromChatRoom(competition.posterId, FirebaseAuth.getInstance().getUid());
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -108,6 +114,13 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             .addOnSuccessListener(doc -> {
                 registeredGames = (List<String>) doc.get("registeredGames");
                 if (registeredGames == null) registeredGames = new ArrayList<>();
+                android.util.Log.d("HomeFragment", "Loaded registered games: " + registeredGames.size());
+                adapter.setRegisteredGameIds(registeredGames);
+                loadCompetitions();
+            })
+            .addOnFailureListener(e -> {
+                android.util.Log.e("HomeFragment", "Error loading registered games: " + e.getMessage());
+                registeredGames = new ArrayList<>();
                 adapter.setRegisteredGameIds(registeredGames);
                 loadCompetitions();
             });
@@ -119,13 +132,23 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load competitions", Toast.LENGTH_SHORT).show());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh competitions when returning to the fragment
+        loadCompetitions();
+    }
+
     private void onCompetitionsLoaded(QuerySnapshot queryDocumentSnapshots) {
         competitions.clear();
         allCompetitions.clear();
         for (DocumentSnapshot doc : queryDocumentSnapshots) {
             Competition comp = doc.toObject(Competition.class);
-            competitions.add(comp);
-            allCompetitions.add(comp);
+            if (comp != null) {
+                comp.posterId = doc.getId(); // Set the document ID as posterId
+                competitions.add(comp);
+                allCompetitions.add(comp);
+            }
         }
         adapter.setCompetitions(competitions);
         adapter.setRegisteredGameIds(registeredGames);
@@ -137,7 +160,13 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         if (userId == null) return;
         FirebaseFirestore.getInstance().collection("users").document(userId)
             .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
-            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show())
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                // Add user to chat room
+                addUserToChatRoom(competition.posterId, competition.name, userId);
+                // Refresh the list
+                loadUserRegisteredGames(userId);
+            })
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
@@ -147,7 +176,13 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         if (userId == null) return;
         FirebaseFirestore.getInstance().collection("users").document(userId)
             .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
-            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show())
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                // Remove user from chat room
+                removeUserFromChatRoom(competition.posterId, userId);
+                // Refresh the list
+                loadUserRegisteredGames(userId);
+            })
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
@@ -195,6 +230,37 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             }
         }
         adapter.setCompetitions(competitions);
+    }
+
+    private void addUserToChatRoom(String competitionId, String competitionName, String userId) {
+        if (userId == null) return;
+        
+        db.collection("chat_rooms").document(competitionId).get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    // Update existing chat room
+                    documentSnapshot.getReference().update("participantIds", FieldValue.arrayUnion(userId));
+                } else {
+                    // Create new chat room
+                    List<String> participantIds = new ArrayList<>();
+                    participantIds.add(userId);
+                    
+                    ChatRoom chatRoom = new ChatRoom(competitionId, competitionId, competitionName, participantIds);
+                    db.collection("chat_rooms").document(competitionId).set(chatRoom);
+                }
+            });
+    }
+
+    private void removeUserFromChatRoom(String competitionId, String userId) {
+        if (userId == null) return;
+        
+        db.collection("chat_rooms").document(competitionId).get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    // Remove user from chat room
+                    documentSnapshot.getReference().update("participantIds", FieldValue.arrayRemove(userId));
+                }
+            });
     }
 
     // Simple details fragment for demonstration

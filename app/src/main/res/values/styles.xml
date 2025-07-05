@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Circular Image Style -->
     <style name="CircularImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+        <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+            <item name="android:textColor">@color/colorPrimary</item>
+        </style>
+        <style name="MyDatePickerDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
+            <item name="colorPrimary">@color/colorPrimary</item>
+            <item name="colorOnPrimary">@color/white</item>
+            <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+            <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+            <item name="android:datePickerStyle">@style/MyDatePickerStyle</item>
+        </style>
+        <style name="MyDatePickerStyle" parent="Widget.MaterialComponents.MaterialCalendar">
+            <item name="android:headerBackground">@color/colorPrimary</item>
+        </style>
+        <style name="MyTimePickerDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
+            <item name="colorPrimary">@color/colorPrimary</item>
+            <item name="colorOnPrimary">@color/white</item>
+            <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+            <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+        </style>
 </resources>

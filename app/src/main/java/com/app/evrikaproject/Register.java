@@ -7,11 +7,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Register extends AppCompatActivity {
     private EditText etUsername, etRealName, etRealSurname, etEmail, etPassword, etConfirmPassword, etAge, etGender;
@@ -20,6 +23,20 @@ public class Register extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Register");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
+        // Add click listener to toolbar navigation icon as backup
+        toolbar.setNavigationOnClickListener(v -> {
+            android.util.Log.d("Register", "Toolbar navigation clicked");
+            finish();
+        });
 
         etUsername = findViewById(R.id.username);
         etRealName = findViewById(R.id.name);
@@ -32,7 +49,13 @@ public class Register extends AppCompatActivity {
 
         etGender.setOnClickListener(v -> showGenderDialog());
 
-        findViewById(R.id.registerNow).setOnClickListener(v -> registerUser());
+        findViewById(R.id.registerBtn).setOnClickListener(v -> registerUser());
+        
+        // Add click listener for "Click to Login" TextView
+        findViewById(R.id.loginNow).setOnClickListener(v -> {
+            startActivity(new Intent(this, Login.class));
+            finish();
+        });
     }
 
     private void showGenderDialog() {
@@ -83,8 +106,17 @@ public class Register extends AppCompatActivity {
                             .addOnCompleteListener(verifyTask -> {
                                 if (verifyTask.isSuccessful()) {
                                     String uid = firebaseUser.getUid();
-                                    User user = new User(uid, username, realName, realSurname, email, age, gender);
-                                    FirebaseFirestore.getInstance().collection("users").document(uid).set(user)
+                                    Map<String, Object> map = new HashMap<>();
+                                    map.put("username", username);
+                                    map.put("name", realName);
+                                    map.put("surname", realSurname);
+                                    map.put("uid", uid);
+                                    map.put("age", age);
+                                    map.put("gender", gender);
+                                    map.put("email", email);
+                                    map.put("profileImage", "");
+                                    map.put("registeredGames", new ArrayList<String>());
+                                    FirebaseFirestore.getInstance().collection("users").document(uid).set(map)
                                         .addOnSuccessListener(aVoid -> {
                                             Toast.makeText(this, "Registration successful! Please verify your email.", Toast.LENGTH_LONG).show();
                                             startActivity(new Intent(this, LoginOtp.class));
@@ -124,5 +156,14 @@ public class Register extends AppCompatActivity {
             this.gender = gender;
             this.registeredGames = new ArrayList<>();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

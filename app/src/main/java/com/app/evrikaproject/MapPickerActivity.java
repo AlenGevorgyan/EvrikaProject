@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import org.maplibre.android.geometry.LatLng;
 import org.maplibre.android.maps.MapLibreMap;
 import org.maplibre.android.maps.MapView;
@@ -22,6 +23,21 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_picker);
+        
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Pick Location");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
+        // Add click listener to toolbar navigation icon as backup
+        toolbar.setNavigationOnClickListener(v -> {
+            android.util.Log.d("MapPickerActivity", "Toolbar navigation clicked");
+            finish();
+        });
+        
         mapView = findViewById(R.id.mapView);
         btnConfirm = findViewById(R.id.btn_confirm_location);
         mapView.onCreate(savedInstanceState);
@@ -42,7 +58,7 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onMapReady(@NonNull MapLibreMap mapLibreMap) {
         this.mapLibreMap = mapLibreMap;
-        mapLibreMap.setStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wxQI2tnsdCLI4pSXvQVA", style -> {
+        mapLibreMap.setStyle("https://api.maptiler.com/maps/streets/style.json?key=wxQI2tnsdCLI4pSXvQVA", style -> {
             mapLibreMap.addOnMapClickListener(point -> {
                 selectedLatLng = point;
                 mapLibreMap.clear();
@@ -59,4 +75,13 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     @Override public void onLowMemory() { mapView.onLowMemory(); super.onLowMemory(); }
     @Override protected void onDestroy() { mapView.onDestroy(); super.onDestroy(); }
     @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState); mapView.onSaveInstanceState(outState); }
+    
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 } 

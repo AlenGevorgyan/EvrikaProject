@@ -50,7 +50,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         Competition comp = competitions.get(position);
         holder.tvName.setText(comp.name);
         holder.tvSport.setText(comp.sport != null ? comp.sport : "");
-        holder.tvDate.setText(comp.date != null ? comp.date : "");
+        holder.tvDate.setText(comp.date != null ? comp.date + " : " + comp.time : "");
         holder.tvPlayerCount.setText("Players: " + (comp.teamPlayerCount > 0 ? comp.teamPlayerCount : "N/A"));
         holder.tvLocation.setText("Location: Stadium"); // Static location for now
         // Set background image based on sport
@@ -64,17 +64,52 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.bgSportImage.setImageResource(R.drawable.ic_launcher_background);
         }
         boolean isRegistered = registeredGameIds != null && comp.posterId != null && registeredGameIds.contains(comp.posterId);
+        boolean isHost = userId != null && userId.equals(comp.createdBy);
+        
+        // Debug logging
+        android.util.Log.d("CompetitionAdapter", "Competition: " + comp.name);
+        android.util.Log.d("CompetitionAdapter", "posterId: " + comp.posterId);
+        android.util.Log.d("CompetitionAdapter", "createdBy: " + comp.createdBy);
+        android.util.Log.d("CompetitionAdapter", "userId: " + userId);
+        android.util.Log.d("CompetitionAdapter", "isHost: " + isHost);
+        android.util.Log.d("CompetitionAdapter", "isRegistered: " + isRegistered);
+        android.util.Log.d("CompetitionAdapter", "registeredMode: " + registeredMode);
+        
+        // Reset all button visibilities
+        holder.btnLeave.setVisibility(View.GONE);
+        holder.btnEdit.setVisibility(View.GONE);
+        holder.btnDelete.setVisibility(View.GONE);
+        
         if (registeredMode || isRegistered) {
             holder.btnViewDetails.setText("Chat");
-            holder.btnViewDetails.setOnClickListener(v -> listener.onViewDetails(comp));
-            holder.btnViewDetails.setOnLongClickListener(v -> {
-                listener.onRemove(comp);
-                return true;
+            holder.btnViewDetails.setOnClickListener(v -> {
+                // Launch chat activity
+                android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
+                intent.putExtra("competition_id", comp.posterId);
+                intent.putExtra("competition_name", comp.name);
+                context.startActivity(intent);
             });
+            
+            if (isHost) {
+                // Show edit and delete buttons for host
+                holder.btnEdit.setVisibility(View.VISIBLE);
+                holder.btnDelete.setVisibility(View.VISIBLE);
+                
+                holder.btnEdit.setOnClickListener(v -> {
+                    android.content.Intent intent = new android.content.Intent(context, EditCompetitionActivity.class);
+                    intent.putExtra("competition_id", comp.posterId);
+                    context.startActivity(intent);
+                });
+                
+                holder.btnDelete.setOnClickListener(v -> showDeleteConfirmation(comp));
+            } else {
+                // Show leave button for participants
+                holder.btnLeave.setVisibility(View.VISIBLE);
+                holder.btnLeave.setOnClickListener(v -> listener.onRemove(comp));
+            }
         } else {
             holder.btnViewDetails.setText("Join now");
             holder.btnViewDetails.setOnClickListener(v -> listener.onJoin(comp));
-            holder.btnViewDetails.setOnLongClickListener(null);
         }
         holder.ivUserAvatar.setImageResource(R.drawable.ic_person); // Placeholder for user avatar
         holder.tvLocation.setOnClickListener(v -> {
@@ -102,9 +137,40 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         notifyDataSetChanged();
     }
 
+
+
+    private void showDeleteConfirmation(Competition competition) {
+        new androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle("Delete Competition")
+            .setMessage("Are you sure you want to delete this competition? This action cannot be undone.")
+            .setPositiveButton("Delete", (dialog, which) -> {
+                // Delete the competition
+                com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("games").document(competition.posterId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        // Also delete the chat room
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("chat_rooms").document(competition.posterId)
+                            .delete()
+                            .addOnSuccessListener(aVoid2 -> {
+                                android.widget.Toast.makeText(context, "Competition deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                android.widget.Toast.makeText(context, "Competition deleted but failed to delete chat room", android.widget.Toast.LENGTH_SHORT).show();
+                            });
+                    })
+                    .addOnFailureListener(e -> {
+                        android.widget.Toast.makeText(context, "Failed to delete competition: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                    });
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
     static class CompetitionViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvSport, tvDate, tvPlayerCount, tvLocation;
-        Button btnViewDetails;
+        Button btnViewDetails, btnLeave, btnEdit, btnDelete;
         ImageView bgSportImage;
         com.google.android.material.imageview.ShapeableImageView ivUserAvatar;
         CompetitionViewHolder(View itemView) {
@@ -115,6 +181,9 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             tvPlayerCount = itemView.findViewById(R.id.tv_player_count);
             tvLocation = itemView.findViewById(R.id.tv_location);
             btnViewDetails = itemView.findViewById(R.id.btn_view_details);
+            btnLeave = itemView.findViewById(R.id.btn_leave);
+            btnEdit = itemView.findViewById(R.id.btn_edit);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
             bgSportImage = itemView.findViewById(R.id.bg_sport_image);
             ivUserAvatar = itemView.findViewById(R.id.iv_user_avatar);
         }

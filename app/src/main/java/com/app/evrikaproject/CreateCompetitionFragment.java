@@ -32,8 +32,6 @@ public class CreateCompetitionFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PICK_LOCATION_REQUEST = 102;
     private ImageView ivMainImage;
-    private ChipGroup chipGroupType;
-    private Chip chipPublic, chipPrivate;
     private MaterialButton btnPickImage, btnPickDate, btnPickTime, btnCreate, btnPickLocation;
     private EditText etName, etTeamPlayerCount;
     private AutoCompleteTextView spinnerSport;
@@ -42,6 +40,8 @@ public class CreateCompetitionFragment extends Fragment {
     private String selectedDate = "";
     private String selectedTime = "";
     private double selectedLat = 0, selectedLng = 0;
+    private MaterialButton btnPublic, btnPrivate;
+    private String selectedType = "public";
 
     @Nullable
     @Override
@@ -49,9 +49,6 @@ public class CreateCompetitionFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_create_competition, container, false);
         etName = view.findViewById(R.id.et_competition_name);
         spinnerSport = view.findViewById(R.id.create_spinner_sport);
-        chipGroupType = view.findViewById(R.id.rg_type);
-        chipPublic = view.findViewById(R.id.rb_public);
-        chipPrivate = view.findViewById(R.id.rb_private);
         etTeamPlayerCount = view.findViewById(R.id.et_team_player_count);
         tvLocation = view.findViewById(R.id.tv_location);
         btnPickDate = view.findViewById(R.id.btn_pick_date);
@@ -60,6 +57,8 @@ public class CreateCompetitionFragment extends Fragment {
         tvTime = view.findViewById(R.id.tv_time);
         btnCreate = view.findViewById(R.id.btn_create_competition);
         btnPickLocation = view.findViewById(R.id.btn_pick_location);
+        btnPublic = view.findViewById(R.id.btn_public);
+        btnPrivate = view.findViewById(R.id.btn_private);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 R.layout.item_dropdown_black,
@@ -83,18 +82,19 @@ public class CreateCompetitionFragment extends Fragment {
             startActivityForResult(intent, PICK_LOCATION_REQUEST);
         });
 
-        chipGroupType.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == chipPublic.getId()) {
-                chipPublic.setChipBackgroundColorResource(R.color.colorPrimary);
-                chipPublic.setTextColor(getResources().getColor(android.R.color.white));
-                chipPrivate.setChipBackgroundColorResource(android.R.color.darker_gray);
-                chipPrivate.setTextColor(getResources().getColor(android.R.color.black));
-            } else if (checkedId == chipPrivate.getId()) {
-                chipPrivate.setChipBackgroundColorResource(R.color.colorPrimary);
-                chipPrivate.setTextColor(getResources().getColor(android.R.color.white));
-                chipPublic.setChipBackgroundColorResource(android.R.color.darker_gray);
-                chipPublic.setTextColor(getResources().getColor(android.R.color.black));
-            }
+        btnPublic.setOnClickListener(v -> {
+            selectedType = "public";
+            btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+            btnPublic.setTextColor(getResources().getColor(android.R.color.white));
+            btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+            btnPrivate.setTextColor(getResources().getColor(android.R.color.black));
+        });
+        btnPrivate.setOnClickListener(v -> {
+            selectedType = "private";
+            btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+            btnPrivate.setTextColor(getResources().getColor(android.R.color.white));
+            btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+            btnPublic.setTextColor(getResources().getColor(android.R.color.black));
         });
 
         return view;
@@ -150,22 +150,14 @@ public class CreateCompetitionFragment extends Fragment {
     }
 
     private void createCompetition() {
-        String name = etName.getText().toString().trim();
+        String gameName = etName.getText().toString().trim();
         String sport = spinnerSport.getText().toString();
-        String type;
-        int checkedId = chipGroupType.getCheckedChipId();
-        if (checkedId == chipPublic.getId()) {
-            type = "public";
-        } else if (checkedId == chipPrivate.getId()) {
-            type = "private";
-        } else {
-            type = "";
-        }
+        String type = selectedType;
         String teamPlayerCountStr = etTeamPlayerCount.getText().toString().trim();
         int teamPlayerCount = teamPlayerCountStr.isEmpty() ? 0 : Integer.parseInt(teamPlayerCountStr);
 
         boolean hasError = false;
-        if (name.isEmpty()) {
+        if (gameName.isEmpty()) {
             etName.setError("Enter a name");
             hasError = true;
         }
@@ -204,11 +196,10 @@ public class CreateCompetitionFragment extends Fragment {
 
         Map<String, Object> competitionData = new HashMap<>();
         competitionData.put("compId", compId);
-        competitionData.put("name", name);
+        competitionData.put("game_name", gameName);
         competitionData.put("sport", sport);
         competitionData.put("type", type);
         competitionData.put("posterId", userId);
-        competitionData.put("teams", initialPlayers);
         competitionData.put("teamPlayerCount", teamPlayerCount);
         competitionData.put("latitude", selectedLat);
         competitionData.put("longitude", selectedLng);

@@ -48,7 +48,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
     @Override
     public void onBindViewHolder(@NonNull CompetitionViewHolder holder, int position) {
         Competition comp = competitions.get(position);
-        holder.tvName.setText(comp.name);
+        holder.tvName.setText(comp.game_name);
         holder.tvSport.setText(comp.sport != null ? comp.sport : "");
         holder.tvDate.setText(comp.date != null ? comp.date + " : " + comp.time : "");
         holder.tvPlayerCount.setText("Players: " + (comp.teamPlayerCount > 0 ? comp.teamPlayerCount : "N/A"));
@@ -66,7 +66,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         boolean isHost = userId != null && userId.equals(comp.createdBy);
         
         // Debug logging
-        android.util.Log.d("CompetitionAdapter", "Competition: " + comp.name);
+        android.util.Log.d("CompetitionAdapter", "Competition: " + comp.game_name);
         android.util.Log.d("CompetitionAdapter", "posterId: " + comp.posterId);
         android.util.Log.d("CompetitionAdapter", "createdBy: " + comp.createdBy);
         android.util.Log.d("CompetitionAdapter", "userId: " + userId);
@@ -86,7 +86,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
                 // Launch chat activity
                 android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
                 intent.putExtra("competition_id", comp.posterId);
-                intent.putExtra("competition_name", comp.name);
+                intent.putExtra("competition_name", comp.game_name);
                 context.startActivity(intent);
             });
             

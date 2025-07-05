@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Competition {
     public String posterId;
-    public String name;
+    public String game_name;
     public String sport;
     public String type; // "public" or "private"
     public String createdBy;
@@ -19,9 +19,9 @@ public class Competition {
 
     public Competition() {} // Firestore needs this
 
-    public Competition(String id, String name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time, List<String> requests) {
+    public Competition(String id, String game_name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time, List<String> requests) {
         this.posterId = id;
-        this.name = name;
+        this.game_name = game_name;
         this.sport = sport;
         this.type = type;
         this.createdBy = createdBy;
@@ -43,12 +43,12 @@ public class Competition {
         this.posterId = posterId;
     }
 
-    public String getName() {
-        return name;
+    public String getGame_name() {
+        return game_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGame_name(String game_name) {
+        this.game_name = game_name;
     }
 
     public String getSport() {

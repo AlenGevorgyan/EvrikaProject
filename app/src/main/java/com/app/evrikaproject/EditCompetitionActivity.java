@@ -15,6 +15,8 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.chip.Chip;
-import androidx.activity.OnBackPressedCallback;
 import android.widget.ImageButton;
 import androidx.cardview.widget.CardView;
 
@@ -41,8 +40,8 @@ public class EditCompetitionActivity extends AppCompatActivity {
     private String currentUserId;
     private Calendar calendar;
     private LinearLayout requestsContainer;
-    private ChipGroup chipGroupType;
-    private Chip chipPublic, chipPrivate;
+    private MaterialButton btnPublic, btnPrivate;
+    private String selectedType = "public";
     private TextView tvLocation;
     private MaterialButton btnPickLocation;
     private double latitude = 0, longitude = 0;
@@ -100,9 +99,8 @@ public class EditCompetitionActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
         btnDelete = findViewById(R.id.btn_delete);
         requestsContainer = findViewById(R.id.requests_container);
-        chipGroupType = findViewById(R.id.chip_group_type);
-        chipPublic = findViewById(R.id.chip_public);
-        chipPrivate = findViewById(R.id.chip_private);
+        btnPublic = findViewById(R.id.btn_public);
+        btnPrivate = findViewById(R.id.btn_private);
         tvLocation = findViewById(R.id.tv_location);
         btnPickLocation = findViewById(R.id.btn_pick_location);
         requestsCard = findViewById(R.id.request_card);
@@ -127,20 +125,21 @@ public class EditCompetitionActivity extends AppCompatActivity {
             startActivityForResult(intent, 1023);
         });
 
-        chipGroupType.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == chipPublic.getId()) {
-                chipPublic.setChipBackgroundColorResource(R.color.colorPrimary);
-                chipPublic.setTextColor(getResources().getColor(android.R.color.white));
-                chipPrivate.setChipBackgroundColorResource(android.R.color.darker_gray);
-                chipPrivate.setTextColor(getResources().getColor(android.R.color.black));
-                if (requestsCard != null) requestsCard.setVisibility(View.GONE);
-            } else if (checkedId == chipPrivate.getId()) {
-                chipPrivate.setChipBackgroundColorResource(R.color.colorPrimary);
-                chipPrivate.setTextColor(getResources().getColor(android.R.color.white));
-                chipPublic.setChipBackgroundColorResource(android.R.color.darker_gray);
-                chipPublic.setTextColor(getResources().getColor(android.R.color.black));
-                if (requestsCard != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
-            }
+        btnPublic.setOnClickListener(v -> {
+            selectedType = "public";
+            btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+            btnPublic.setTextColor(getResources().getColor(android.R.color.white));
+            btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+            btnPrivate.setTextColor(getResources().getColor(android.R.color.black));
+            if (requestsCard != null) requestsCard.setVisibility(View.GONE);
+        });
+        btnPrivate.setOnClickListener(v -> {
+            selectedType = "private";
+            btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+            btnPrivate.setTextColor(getResources().getColor(android.R.color.white));
+            btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+            btnPublic.setTextColor(getResources().getColor(android.R.color.black));
+            if (requestsCard != null && competition != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
         });
     }
 
@@ -158,7 +157,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
                         }
 
                         // Populate fields
-                        etName.setText(competition.getName());
+                        etName.setText(competition.getGame_name());
                         etDate.setText(competition.getDate());
                         etTime.setText(competition.getTime());
                         etTeamPlayerCount.setText(String.valueOf(competition.getTeamPlayerCount()));
@@ -172,13 +171,23 @@ public class EditCompetitionActivity extends AppCompatActivity {
                             spinnerSport.setText(sport, false);
                         }
 
-                        // Set chip selection for type
+                        // Set button selection for type
                         String type = competition.getType();
                         if (type != null) {
                             if (type.equals("public")) {
-                                chipGroupType.check(chipPublic.getId());
+                                selectedType = "public";
+                                btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                                btnPublic.setTextColor(getResources().getColor(android.R.color.white));
+                                btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+                                btnPrivate.setTextColor(getResources().getColor(android.R.color.black));
+                                if (requestsCard != null) requestsCard.setVisibility(View.GONE);
                             } else if (type.equals("private")) {
-                                chipGroupType.check(chipPrivate.getId());
+                                selectedType = "private";
+                                btnPrivate.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                                btnPrivate.setTextColor(getResources().getColor(android.R.color.white));
+                                btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
+                                btnPublic.setTextColor(getResources().getColor(android.R.color.black));
+                                if (requestsCard != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
                             }
                         }
 
@@ -250,7 +259,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
         String time = etTime.getText().toString().trim();
         String teamPlayerCountStr = etTeamPlayerCount.getText().toString().trim();
         String sport = spinnerSport.getText().toString();
-        String type = chipGroupType.getCheckedChipId() == chipPublic.getId() ? "public" : "private";
+        String type = selectedType;
 
         // Validation
         if (name.isEmpty() || date.isEmpty() || time.isEmpty() || teamPlayerCountStr.isEmpty()) {
@@ -267,7 +276,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
         }
 
         // Update competition
-        competition.setName(name);
+        competition.setGame_name(name);
         competition.setDate(date);
         competition.setTime(time);
         competition.setTeamPlayerCount(teamPlayerCount);

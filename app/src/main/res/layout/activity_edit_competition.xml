@@ -97,35 +97,34 @@
                         android:textColor="@color/colorPrimary"
                         android:layout_marginBottom="12dp" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chip_group_type"
+                    <LinearLayout
+                        android:id="@+id/layout_type_buttons"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:singleSelection="true"
-                        app:selectionRequired="true">
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_public"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_public"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
                             android:text="Public"
-                            android:checked="true"
-                            app:chipBackgroundColor="@color/colorPrimary"
+                            android:backgroundTint="@color/colorPrimary"
                             android:textColor="@color/white"
-                            app:chipStrokeColor="@color/colorPrimary"
-                            app:chipStrokeWidth="2dp"
-                            app:checkedIconVisible="false"/>
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_private"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="8dp"/>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_private"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
                             android:text="Private"
-                            app:chipBackgroundColor="@color/colorPrimary"
-                            android:textColor="@color/white"
-                            app:chipStrokeColor="@color/colorPrimary"
-                            app:chipStrokeWidth="2dp"
-                            app:checkedIconVisible="false"/>
-                    </com.google.android.material.chip.ChipGroup>
+                            android:backgroundTint="@color/gray"
+                            android:textColor="@color/black"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
 
                     <!-- Date -->
                     <com.google.android.material.textfield.TextInputLayout

@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                     .addOnSuccessListener(aVoid -> {
                         registeredGames.add(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
-                        Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Joined competition: " + competition.game_name, Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
@@ -63,14 +63,14 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                     .addOnSuccessListener(aVoid -> {
                         registeredGames.remove(competition.posterId);
                         adapter.setRegisteredGameIds(registeredGames);
-                        Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Left competition: " + competition.game_name, Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to leave: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
             @Override
             public void onViewDetails(Competition competition) {
                 requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, CompetitionDetailsFragment.newInstance(competition.name))
+                    .replace(R.id.fragment_container, CompetitionDetailsFragment.newInstance(competition.game_name))
                     .addToBackStack(null)
                     .commit();
             }
@@ -155,7 +155,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         FirebaseFirestore.getInstance().collection("users").document(userId)
             .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
             .addOnSuccessListener(aVoid -> {
-                Toast.makeText(getContext(), "Joined competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Joined competition: " + competition.game_name, Toast.LENGTH_SHORT).show();
                 // Refresh the list
                 loadUserRegisteredGames(userId);
             })
@@ -169,7 +169,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         FirebaseFirestore.getInstance().collection("users").document(userId)
             .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
             .addOnSuccessListener(aVoid -> {
-                Toast.makeText(getContext(), "Left competition: " + competition.name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Left competition: " + competition.game_name, Toast.LENGTH_SHORT).show();
                 // Refresh the list
                 loadUserRegisteredGames(userId);
             })
@@ -180,7 +180,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
     public void onViewDetails(Competition competition) {
         // Navigate to a simple details fragment
         requireActivity().getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragment_container, CompetitionDetailsFragment.newInstance(competition.name))
+            .replace(R.id.fragment_container, CompetitionDetailsFragment.newInstance(competition.game_name))
             .addToBackStack(null)
             .commit();
     }
@@ -188,7 +188,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
     public void searchCompetitions(String query) {
         competitions.clear();
         for (Competition c : allCompetitions) {
-            if (c.name != null && c.name.toLowerCase().contains(query.toLowerCase())) {
+            if (c.game_name != null && c.game_name.toLowerCase().contains(query.toLowerCase())) {
                 competitions.add(c);
             }
         }

@@ -138,6 +138,19 @@
                     android:textColor="@android:color/white"
                     android:visibility="gone"/>
 
+                <!-- Request to Join Button (for private games) -->
+                <Button
+                    android:id="@+id/btn_request_join"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Request to Join"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

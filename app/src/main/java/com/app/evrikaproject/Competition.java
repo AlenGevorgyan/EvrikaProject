@@ -15,10 +15,11 @@ public class Competition {
     public double latitude;
     public double longitude;
     public String time;
+    public List<String> requests; // User IDs who requested to join (for private games)
 
     public Competition() {} // Firestore needs this
 
-    public Competition(String id, String name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time) {
+    public Competition(String id, String name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time, List<String> requests) {
         this.posterId = id;
         this.name = name;
         this.sport = sport;
@@ -31,6 +32,7 @@ public class Competition {
         this.latitude = latitude;
         this.longitude = longitude;
         this.time = time;
+        this.requests = requests;
     }
 
     public String getPosterId() {
@@ -127,5 +129,13 @@ public class Competition {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public List<String> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(List<String> requests) {
+        this.requests = requests;
     }
 }

@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -30,10 +32,11 @@ public class CreateCompetitionFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PICK_LOCATION_REQUEST = 102;
     private ImageView ivMainImage;
+    private ChipGroup chipGroupType;
+    private Chip chipPublic, chipPrivate;
     private MaterialButton btnPickImage, btnPickDate, btnPickTime, btnCreate, btnPickLocation;
     private EditText etName, etTeamPlayerCount;
-    private Spinner spinnerSport;
-    private RadioGroup rgType;
+    private AutoCompleteTextView spinnerSport;
     private TextView tvLocation, tvDate, tvTime;
     private Uri imageUri;
     private String selectedDate = "";
@@ -45,8 +48,10 @@ public class CreateCompetitionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_create_competition, container, false);
         etName = view.findViewById(R.id.et_competition_name);
-        spinnerSport = view.findViewById(R.id.spinner_sport);
-        rgType = view.findViewById(R.id.rg_type);
+        spinnerSport = view.findViewById(R.id.create_spinner_sport);
+        chipGroupType = view.findViewById(R.id.rg_type);
+        chipPublic = view.findViewById(R.id.rb_public);
+        chipPrivate = view.findViewById(R.id.rb_private);
         etTeamPlayerCount = view.findViewById(R.id.et_team_player_count);
         tvLocation = view.findViewById(R.id.tv_location);
         btnPickDate = view.findViewById(R.id.btn_pick_date);
@@ -124,9 +129,8 @@ public class CreateCompetitionFragment extends Fragment {
 
     private void createCompetition() {
         String name = etName.getText().toString().trim();
-        String sport = spinnerSport.getSelectedItem().toString();
-        int checkedId = rgType.getCheckedRadioButtonId();
-        String type = checkedId == R.id.rb_public ? "public" : checkedId == R.id.rb_private ? "private" : "";
+        String sport = spinnerSport.getText().toString();
+        String type = chipGroupType.getCheckedChipId() == chipPublic.getId() ? "public" : "private";
         String teamPlayerCountStr = etTeamPlayerCount.getText().toString().trim();
         int teamPlayerCount = teamPlayerCountStr.isEmpty() ? 0 : Integer.parseInt(teamPlayerCountStr);
 
@@ -183,6 +187,7 @@ public class CreateCompetitionFragment extends Fragment {
         competitionData.put("longitude", selectedLng);
         competitionData.put("date", selectedDate);
         competitionData.put("time", selectedTime);
+        competitionData.put("requests", new ArrayList<>());
 
         CollectionReference reference = FirebaseFirestore.getInstance().collection("games");
 

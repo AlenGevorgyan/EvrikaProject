@@ -79,6 +79,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         holder.btnLeave.setVisibility(View.GONE);
         holder.btnEdit.setVisibility(View.GONE);
         holder.btnDelete.setVisibility(View.GONE);
+        holder.btnRequestJoin.setVisibility(View.GONE);
         
         if (registeredMode || isRegistered) {
             holder.btnViewDetails.setText("Chat");
@@ -111,6 +112,44 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.btnViewDetails.setText("Join now");
             holder.btnViewDetails.setOnClickListener(v -> listener.onJoin(comp));
         }
+
+        if (comp.type != null && comp.type.equalsIgnoreCase("private") && !isHost) {
+            boolean isInTeam = comp.teams != null && comp.teams.contains(userId);
+            boolean hasRequested = comp.requests != null && comp.requests.contains(userId);
+            if (!isInTeam) {
+                holder.btnViewDetails.setVisibility(View.GONE);
+                holder.btnRequestJoin.setVisibility(View.VISIBLE);
+                if (hasRequested) {
+                    holder.btnRequestJoin.setText("Cancel Request");
+                    holder.btnRequestJoin.setOnClickListener(v -> {
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("games").document(comp.posterId)
+                            .update("requests", com.google.firebase.firestore.FieldValue.arrayRemove(userId))
+                            .addOnSuccessListener(aVoid -> {
+                                if (comp.requests != null) comp.requests.remove(userId);
+                                notifyItemChanged(position);
+                                android.widget.Toast.makeText(context, "Request canceled", android.widget.Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> android.widget.Toast.makeText(context, "Failed to cancel request: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show());
+                    });
+                } else {
+                    holder.btnRequestJoin.setText("Request to Join");
+                    holder.btnRequestJoin.setOnClickListener(v -> {
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("games").document(comp.posterId)
+                            .update("requests", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
+                            .addOnSuccessListener(aVoid -> {
+                                if (comp.requests == null) comp.requests = new java.util.ArrayList<>();
+                                comp.requests.add(userId);
+                                notifyItemChanged(position);
+                                android.widget.Toast.makeText(context, "Request sent", android.widget.Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> android.widget.Toast.makeText(context, "Failed to send request: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show());
+                    });
+                }
+            }
+        }
+
         holder.ivUserAvatar.setImageResource(R.drawable.ic_person); // Placeholder for user avatar
         holder.tvLocation.setOnClickListener(v -> {
             if (comp.latitude != 0 && comp.longitude != 0) {
@@ -170,7 +209,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
 
     static class CompetitionViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvSport, tvDate, tvPlayerCount, tvLocation;
-        Button btnViewDetails, btnLeave, btnEdit, btnDelete;
+        Button btnViewDetails, btnLeave, btnEdit, btnDelete, btnRequestJoin;
         ImageView bgSportImage;
         com.google.android.material.imageview.ShapeableImageView ivUserAvatar;
         CompetitionViewHolder(View itemView) {
@@ -186,6 +225,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             btnDelete = itemView.findViewById(R.id.btn_delete);
             bgSportImage = itemView.findViewById(R.id.bg_sport_image);
             ivUserAvatar = itemView.findViewById(R.id.iv_user_avatar);
+            btnRequestJoin = itemView.findViewById(R.id.btn_request_join);
         }
     }
 }

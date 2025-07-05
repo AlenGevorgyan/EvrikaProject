@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_orange_gradient"
+    android:background="@drawable/bg_gradient_orange"
     android:padding="16dp">
 
     <LinearLayout
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:hint="Competition Name"
-                    app:hintTextColor="@color/colorPrimary"
+                    app:hintTextColor="@color/black"
                     app:boxStrokeColor="@color/colorPrimary"
                     app:boxStrokeWidth="2dp"
                     app:boxCornerRadiusTopStart="12dp"
@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:hint="Select Sport"
-                    app:hintTextColor="@color/colorPrimary"
+                    app:hintTextColor="@color/black"
                     app:boxStrokeColor="@color/colorPrimary"
                     app:boxStrokeWidth="2dp"
                     app:boxCornerRadiusTopStart="12dp"
@@ -172,7 +172,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Team Player Count"
-                    app:hintTextColor="@color/colorPrimary"
+                    app:hintTextColor="@color/black"
                     app:boxStrokeColor="@color/colorPrimary"
                     app:boxStrokeWidth="2dp"
                     app:boxCornerRadiusTopStart="12dp"

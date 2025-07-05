@@ -44,7 +44,7 @@
                 app:icon="@drawable/ic_person"
                 app:iconPadding="12dp"
                 app:iconTint="@color/white"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:backgroundTint="@color/colorPrimary"/>
 
             <com.google.android.material.button.MaterialButton
@@ -57,7 +57,7 @@
                 app:icon="@drawable/ic_logout"
                 app:iconPadding="12dp"
                 app:iconTint="@color/white"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:backgroundTint="@color/logout"/>
 
         </LinearLayout>

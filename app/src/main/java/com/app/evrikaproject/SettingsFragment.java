@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +28,8 @@ import java.util.Map;
 public class SettingsFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 101;
     private ImageView ivProfileImage;
-    private EditText etUsername, etRealName, etRealSurname, etGender, etAge;
+    private TextInputEditText etUsername, etRealName, etRealSurname, etGender, etAge;
+    private TextInputLayout tilUsername, tilRealName, tilRealSurname;
     private Button btnSave, btnPickImage;
     private Uri imageUri;
     private String userId;
@@ -37,11 +40,13 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         ivProfileImage = view.findViewById(R.id.iv_profile_image);
+        tilUsername = view.findViewById(R.id.username);
+        tilRealName = view.findViewById(R.id.name);
+        tilRealSurname = view.findViewById(R.id.surname);
         etUsername = view.findViewById(R.id.et_username);
         etRealName = view.findViewById(R.id.et_real_name);
         etRealSurname = view.findViewById(R.id.et_real_surname);
-        etGender = view.findViewById(R.id.et_gender);
-        etAge = view.findViewById(R.id.et_age);
+
         btnSave = view.findViewById(R.id.btn_save);
         btnPickImage = view.findViewById(R.id.btn_pick_image);
         btnBack = view.findViewById(R.id.btn_back);
@@ -60,9 +65,6 @@ public class SettingsFragment extends Fragment {
                 etUsername.setText(doc.getString("username"));
                 etRealName.setText(doc.getString("realName"));
                 etRealSurname.setText(doc.getString("realSurname"));
-                etGender.setText(doc.getString("gender"));
-                Long ageLong = doc.getLong("age");
-                etAge.setText(ageLong != null ? String.valueOf(ageLong) : "");
                 // TODO: Load image from URL if available
             });
     }

@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:text="All"
                 android:backgroundTint="@color/colorPrimary"
-                android:textColor="@android:color/white"
+                android:textColor="@color/black"
                 android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:text="Football"
                 android:backgroundTint="@color/colorSecondary"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/black"
                 android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:text="Basketball"
                 android:backgroundTint="@color/colorSecondary"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/black"
                 android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:text="Volleyball"
                 android:backgroundTint="@color/colorSecondary"
-                android:textColor="@color/colorPrimary"/>
+                android:textColor="@color/black"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -71,6 +71,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/colorPrimary"
-        app:tint="@android:color/white" />
+        app:tint="@color/black" />
 
 </RelativeLayout> 

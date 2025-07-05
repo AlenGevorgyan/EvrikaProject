@@ -26,20 +26,6 @@ public class Login extends AppCompatActivity {
         }
         setContentView(R.layout.activity_login);
         
-        // Setup toolbar with back button
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Login");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        
-        // Add click listener to toolbar navigation icon as backup
-        toolbar.setNavigationOnClickListener(v -> {
-            android.util.Log.d("Login", "Toolbar navigation clicked");
-            finish();
-        });
-        
         etEmail = findViewById(R.id.email);
         etPassword = findViewById(R.id.password);
         registerTV = findViewById(R.id.registerNow);

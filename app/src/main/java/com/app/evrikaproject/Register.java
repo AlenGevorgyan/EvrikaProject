@@ -24,20 +24,6 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Setup toolbar with back button
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Register");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        
-        // Add click listener to toolbar navigation icon as backup
-        toolbar.setNavigationOnClickListener(v -> {
-            android.util.Log.d("Register", "Toolbar navigation clicked");
-            finish();
-        });
-
         etUsername = findViewById(R.id.username);
         etRealName = findViewById(R.id.name);
         etRealSurname = findViewById(R.id.surname);

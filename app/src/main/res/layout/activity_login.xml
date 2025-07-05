@@ -3,19 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_orange_gradient"
+    android:background="@drawable/bg_gradient_orange"
     android:fitsSystemWindows="true">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:navigationIcon="@drawable/ic_back" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -42,7 +31,7 @@
                 android:text="Login"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="#1F2937"
+                android:textColor="@color/black"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

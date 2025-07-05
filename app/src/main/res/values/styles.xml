@@ -6,7 +6,7 @@
         <item name="cornerSize">50%</item>
     </style>
         <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-            <item name="android:textColor">@color/colorPrimary</item>
+            <item name="android:textColor">@color/black</item>
         </style>
         <style name="MyDatePickerDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
             <item name="colorPrimary">@color/colorPrimary</item>

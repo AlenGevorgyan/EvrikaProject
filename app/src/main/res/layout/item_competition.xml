@@ -44,14 +44,14 @@
                 android:text="Competition Name"
                 android:textStyle="bold"
                 android:textSize="18sp"
-                android:textColor="@android:color/white"/>
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/tv_sport_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Football"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="14sp"/>
 
             <TextView
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2025-07-04 16:00"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="14sp"/>
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Players: 10"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:textSize="14sp"/>
 
             <TextView
@@ -98,7 +98,7 @@
                     android:text="Join now"
                     android:layout_marginEnd="4dp"
                     android:backgroundTint="@android:color/holo_green_light"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@color/white"/>
 
                 <!-- Leave Button (for registered games) -->
                 <Button
@@ -110,7 +110,7 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:backgroundTint="@color/logout"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/white"
                     android:visibility="gone"/>
 
                 <!-- Edit Button (for host) -->
@@ -123,7 +123,7 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:backgroundTint="@color/colorPrimary"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/white"
                     android:visibility="gone"/>
 
                 <!-- Delete Button (for host) -->
@@ -135,7 +135,7 @@
                     android:text="Delete"
                     android:layout_marginStart="4dp"
                     android:backgroundTint="@color/logout"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/black"
                     android:visibility="gone"/>
 
                 <!-- Request to Join Button (for private games) -->
@@ -148,7 +148,7 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:backgroundTint="@android:color/holo_blue_light"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/black"
                     android:visibility="gone"/>
 
             </LinearLayout>

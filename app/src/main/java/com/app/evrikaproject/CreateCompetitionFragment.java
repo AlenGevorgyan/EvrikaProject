@@ -62,7 +62,7 @@ public class CreateCompetitionFragment extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 R.layout.item_dropdown_black,
-                new String[]{"football", "basketball", "volleyball"});
+                new String[]{"football", "basketball", "volleyball", "rugby", "hockey", "bicycle"});
         adapter.setDropDownViewResource(R.layout.item_dropdown_black);
         spinnerSport.setAdapter(adapter);
         spinnerSport.setTextColor(getResources().getColor(android.R.color.black));
@@ -205,6 +205,7 @@ public class CreateCompetitionFragment extends Fragment {
         competitionData.put("longitude", selectedLng);
         competitionData.put("date", selectedDate);
         competitionData.put("time", selectedTime);
+        competitionData.put("teams", initialPlayers);
         competitionData.put("requests", new ArrayList<>());
 
         CollectionReference reference = FirebaseFirestore.getInstance().collection("games");

@@ -51,7 +51,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         holder.tvName.setText(comp.game_name);
         holder.tvSport.setText(comp.sport != null ? comp.sport : "");
         holder.tvDate.setText(comp.date != null ? comp.date + " : " + comp.time : "");
-        holder.tvPlayerCount.setText("Players: " + (comp.teamPlayerCount > 0 ? comp.teamPlayerCount : "N/A"));
+        holder.tvPlayerCount.setText("Players needed: " + (comp.teamPlayerCount > 0 ? comp.teams.toArray().length + "/" + comp.teamPlayerCount : "N/A"));
         // Set background image based on sport
         if (comp.sport != null && comp.sport.equalsIgnoreCase("football")) {
             holder.bgSportImage.setImageResource(R.drawable.football);
@@ -59,7 +59,13 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.bgSportImage.setImageResource(R.drawable.basketball);
         } else if (comp.sport != null && comp.sport.equalsIgnoreCase("volleyball")) {
             holder.bgSportImage.setImageResource(R.drawable.volley);
-        } else {
+        } else if (comp.sport != null && comp.sport.equalsIgnoreCase("rugby")) {
+            holder.bgSportImage.setImageResource(R.drawable.rugby);
+        }else if (comp.sport != null && comp.sport.equalsIgnoreCase("hockey")) {
+            holder.bgSportImage.setImageResource(R.drawable.hockey);
+        }else if (comp.sport != null && comp.sport.equalsIgnoreCase("bicycle")) {
+            holder.bgSportImage.setImageResource(R.drawable.bicycle);
+        }else {
             holder.bgSportImage.setImageResource(R.drawable.ic_launcher_background);
         }
         boolean isRegistered = registeredGameIds != null && comp.posterId != null && registeredGameIds.contains(comp.posterId);
@@ -82,13 +88,13 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.btnViewDetails.setText("Chat");
             holder.btnViewDetails.setOnClickListener(v -> {
                 android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
-                intent.putExtra("competition_id", comp.posterId);
+                intent.putExtra("compId", comp.compId);
                 intent.putExtra("competition_name", comp.game_name);
                 context.startActivity(intent);
             });
             holder.btnEdit.setOnClickListener(v -> {
                 android.content.Intent intent = new android.content.Intent(context, EditCompetitionActivity.class);
-                intent.putExtra("competition_id", comp.posterId);
+                intent.putExtra("compId", comp.compId);
                 context.startActivity(intent);
             });
             holder.btnDelete.setOnClickListener(v -> showDeleteConfirmation(comp));
@@ -96,7 +102,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.btnViewDetails.setText("Chat");
             holder.btnViewDetails.setOnClickListener(v -> {
                 android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
-                intent.putExtra("competition_id", comp.posterId);
+                intent.putExtra("compId", comp.compId);
                 intent.putExtra("competition_name", comp.game_name);
                 context.startActivity(intent);
             });

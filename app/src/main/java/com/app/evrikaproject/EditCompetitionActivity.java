@@ -46,13 +46,15 @@ public class EditCompetitionActivity extends AppCompatActivity {
     private MaterialButton btnPickLocation;
     private double latitude = 0, longitude = 0;
     private CardView requestsCard;
+    private CardView registeredPlayersCard;
+    private LinearLayout registeredPlayersContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_competition);
 
-        competitionId = getIntent().getStringExtra("competition_id");
+        competitionId = getIntent().getStringExtra("compId");
         currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? 
                        FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
 
@@ -104,9 +106,11 @@ public class EditCompetitionActivity extends AppCompatActivity {
         tvLocation = findViewById(R.id.tv_location);
         btnPickLocation = findViewById(R.id.btn_pick_location);
         requestsCard = findViewById(R.id.request_card);
+        registeredPlayersCard = findViewById(R.id.registered_players_card);
+        registeredPlayersContainer = findViewById(R.id.registered_players_container);
 
         // Setup spinners
-        ArrayAdapter<String> sportAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown_black, new String[]{"football", "basketball", "volleyball"});
+        ArrayAdapter<String> sportAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown_black, new String[]{"football", "basketball", "volleyball", "rugby", "hockey", "bicycle"});
         sportAdapter.setDropDownViewResource(R.layout.item_dropdown_black);
         spinnerSport.setAdapter(sportAdapter);
         spinnerSport.setTextColor(getResources().getColor(android.R.color.black));
@@ -200,6 +204,9 @@ public class EditCompetitionActivity extends AppCompatActivity {
                                 requestsCard.setVisibility(View.GONE);
                             }
                         }
+
+                        // Show registered players
+                        showRegisteredPlayers();
                     }
                 } else {
                     Toast.makeText(this, "Competition not found", Toast.LENGTH_SHORT).show();
@@ -314,16 +321,8 @@ public class EditCompetitionActivity extends AppCompatActivity {
         // Delete the competition
         db.collection("games").document(competitionId).delete()
             .addOnSuccessListener(aVoid -> {
-                // Also delete the chat room
-                db.collection("chat_rooms").document(competitionId).delete()
-                    .addOnSuccessListener(aVoid2 -> {
-                        Toast.makeText(this, "Competition deleted successfully", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Competition deleted but failed to delete chat room", Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
+                Toast.makeText(this, "Competition deleted successfully", Toast.LENGTH_SHORT).show();
+                finish();
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to delete competition: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -393,6 +392,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
                 if (competition.getTeams() == null) competition.setTeams(new java.util.ArrayList<>());
                 if (!competition.getTeams().contains(requesterId)) competition.getTeams().add(requesterId);
                 showRequests();
+                showRegisteredPlayers(); // Refresh registered players list
                 Toast.makeText(this, "Accepted request", Toast.LENGTH_SHORT).show();
             })
             .addOnFailureListener(e -> Toast.makeText(this, "Failed to accept: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -408,6 +408,97 @@ public class EditCompetitionActivity extends AppCompatActivity {
                 Toast.makeText(this, "Rejected request", Toast.LENGTH_SHORT).show();
             })
             .addOnFailureListener(e -> Toast.makeText(this, "Failed to reject: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void showRegisteredPlayers() {
+        if (competition == null || competition.getTeams() == null || competition.getTeams().isEmpty()) {
+            registeredPlayersContainer.removeAllViews();
+            TextView tv = new TextView(this);
+            tv.setText("No registered players yet.");
+            tv.setTextSize(16);
+            tv.setTextColor(getResources().getColor(R.color.black));
+            tv.setPadding(16, 16, 16, 16);
+            registeredPlayersContainer.addView(tv);
+            return;
+        }
+
+        registeredPlayersContainer.removeAllViews();
+        
+        for (String playerId : competition.getTeams()) {
+            // Get user details from Firestore
+            db.collection("users").document(playerId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String playerName = documentSnapshot.getString("name");
+                        String playerSurname = documentSnapshot.getString("surname");
+                        String fullName = ((playerName != null ? playerName : "Unknown") + " " + 
+                                         (playerSurname != null ? playerSurname : "")).trim();
+                        
+                        // Create player item view
+                        View playerView = getLayoutInflater().inflate(R.layout.item_registered_player, registeredPlayersContainer, false);
+                        TextView tvPlayerName = playerView.findViewById(R.id.tv_player_name);
+                        MaterialButton btnDeletePlayer = playerView.findViewById(R.id.btn_delete_player);
+                        
+                        tvPlayerName.setText(fullName);
+                        
+                        // Only show delete button if not the host
+                        if (!playerId.equals(competition.getPosterId())) {
+                            btnDeletePlayer.setVisibility(View.VISIBLE);
+                            btnDeletePlayer.setOnClickListener(v -> showDeletePlayerConfirmation(playerId, fullName));
+                        } else {
+                            btnDeletePlayer.setVisibility(View.GONE);
+                        }
+                        
+                        registeredPlayersContainer.addView(playerView);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // If user data not found, show player ID
+                    View playerView = getLayoutInflater().inflate(R.layout.item_registered_player, registeredPlayersContainer, false);
+                    TextView tvPlayerName = playerView.findViewById(R.id.tv_player_name);
+                    MaterialButton btnDeletePlayer = playerView.findViewById(R.id.btn_delete_player);
+                    
+                    tvPlayerName.setText("Player ID: " + playerId);
+                    
+                    if (!playerId.equals(competition.getPosterId())) {
+                        btnDeletePlayer.setVisibility(View.VISIBLE);
+                        btnDeletePlayer.setOnClickListener(v -> showDeletePlayerConfirmation(playerId, "Player ID: " + playerId));
+                    } else {
+                        btnDeletePlayer.setVisibility(View.GONE);
+                    }
+                    
+                    registeredPlayersContainer.addView(playerView);
+                });
+        }
+    }
+
+    private void showDeletePlayerConfirmation(String playerId, String playerName) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+            .setTitle("Remove Player")
+            .setMessage("Are you sure you want to remove " + playerName + " from this competition?")
+            .setPositiveButton("Remove", (d, which) -> removePlayer(playerId))
+            .setNegativeButton("Cancel", null)
+            .show();
+
+        TextView messageView = dialog.findViewById(android.R.id.message);
+        if (messageView != null) messageView.setTextColor(getResources().getColor(android.R.color.black));
+        int titleId = getResources().getIdentifier("alertTitle", "id", "android");
+        TextView titleView = dialog.findViewById(titleId);
+        if (titleView != null) titleView.setTextColor(getResources().getColor(android.R.color.black));
+    }
+
+    private void removePlayer(String playerId) {
+        db.collection("games").document(competitionId)
+            .update("teams", com.google.firebase.firestore.FieldValue.arrayRemove(playerId))
+            .addOnSuccessListener(aVoid -> {
+                // Update in-memory array
+                if (competition.getTeams() != null) {
+                    competition.getTeams().remove(playerId);
+                }
+                showRegisteredPlayers();
+                Toast.makeText(this, "Player removed successfully", Toast.LENGTH_SHORT).show();
+            })
+            .addOnFailureListener(e -> Toast.makeText(this, "Failed to remove player: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override

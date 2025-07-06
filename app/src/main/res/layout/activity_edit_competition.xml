@@ -184,7 +184,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Time"
+                        android:hint="Team Player Count"
                         app:hintTextColor="@color/black"
                         app:boxStrokeColor="@color/colorPrimary"
                         app:boxStrokeWidth="2dp"
@@ -193,7 +193,7 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="16dp">">
+                        android:layout_marginBottom="16dp">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_team_player_count"
                             android:layout_width="match_parent"
@@ -243,6 +243,40 @@
                     android:orientation="vertical"
                     android:padding="8dp"
                     android:background="@android:color/transparent" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- Registered Players Container -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/registered_players_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/white">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Registered Players"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginBottom="16dp" />
+                    
+                    <LinearLayout
+                        android:id="@+id/registered_players_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@android:color/transparent" />
+                        
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Buttons -->

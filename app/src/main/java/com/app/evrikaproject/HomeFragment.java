@@ -27,7 +27,7 @@ import androidx.core.content.ContextCompat;
 public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompetitionClickListener {
     private RecyclerView recyclerView;
     private CompetitionAdapter adapter;
-    private MaterialButton btnFilterAll, btnFilterFootball, btnFilterBasketball, btnFilterVolleyball;
+    private MaterialButton btnFilterAll, btnFilterFootball, btnFilterBasketball, btnFilterVolleyball, btnFilterRugby, btnFilterHockey;
     private List<Competition> competitions = new ArrayList<>();
     private List<Competition> allCompetitions = new ArrayList<>();
     private FirebaseFirestore db;
@@ -92,11 +92,15 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         btnFilterFootball = view.findViewById(R.id.btn_filter_football);
         btnFilterBasketball = view.findViewById(R.id.btn_filter_basketball);
         btnFilterVolleyball = view.findViewById(R.id.btn_filter_volleyball);
+        btnFilterRugby = view.findViewById(R.id.btn_filter_rugby);
+        btnFilterHockey = view.findViewById(R.id.btn_filter_hockey);
 
         btnFilterAll.setOnClickListener(v -> setSportFilter("All"));
         btnFilterFootball.setOnClickListener(v -> setSportFilter("football"));
         btnFilterBasketball.setOnClickListener(v -> setSportFilter("basketball"));
         btnFilterVolleyball.setOnClickListener(v -> setSportFilter("volleyball"));
+        btnFilterRugby.setOnClickListener(v -> setSportFilter("rugby"));
+        btnFilterHockey.setOnClickListener(v -> setSportFilter("hockey"));
         setSportFilter("All");
 
         return view;
@@ -121,10 +125,30 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
     }
 
     private void loadCompetitions() {
-        db.collection("games").get()
-            .addOnSuccessListener(this::onCompetitionsLoaded)
-            .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load competitions", Toast.LENGTH_SHORT).show());
+        db.collection("games")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    competitions.clear();
+                    allCompetitions.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Competition comp = doc.toObject(Competition.class);
+                        if (comp != null) {
+                            comp.compId = doc.getId();
+
+                            // Assume comp has List<String> teams and int teamPlayerCount
+                            int currentTeamsCount = (comp.teams != null) ? comp.teams.size() : 0;
+                            if (currentTeamsCount < comp.teamPlayerCount) {
+                                competitions.add(comp);
+                            }
+                            allCompetitions.add(comp);
+                        }
+                    }
+                    adapter.setCompetitions(competitions);
+                    adapter.setRegisteredGameIds(registeredGames);
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load competitions", Toast.LENGTH_SHORT).show());
     }
+
 
     @Override
     public void onResume() {

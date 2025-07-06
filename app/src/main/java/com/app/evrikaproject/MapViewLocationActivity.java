@@ -1,6 +1,8 @@
 package com.app.evrikaproject;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -9,6 +11,7 @@ import org.maplibre.android.maps.MapLibreMap;
 import org.maplibre.android.maps.MapView;
 import org.maplibre.android.maps.OnMapReadyCallback;
 import org.maplibre.android.annotations.MarkerOptions;
+import org.maplibre.android.camera.CameraPosition;
 
 public class MapViewLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
@@ -19,32 +22,51 @@ public class MapViewLocationActivity extends AppCompatActivity implements OnMapR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_view_location);
         
-        // Setup toolbar with back button
+        // Toolbar setup
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Competition Location");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        toolbar.setNavigationOnClickListener(v -> finish());
         
-        // Add click listener to toolbar navigation icon as backup
-        toolbar.setNavigationOnClickListener(v -> {
-            android.util.Log.d("MapViewLocationActivity", "Toolbar navigation clicked");
-            finish();
-        });
-        
+        // UI init
         mapView = findViewById(R.id.mapView);
+        
         mapView.onCreate(savedInstanceState);
         lat = getIntent().getDoubleExtra("lat", 0);
         lng = getIntent().getDoubleExtra("lng", 0);
+        
+        // Validate coordinates
+        if (lat == 0 && lng == 0) {
+            Toast.makeText(this, "Invalid location coordinates", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        
         mapView.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(@NonNull MapLibreMap mapLibreMap) {
-        mapLibreMap.setStyle("https://api.maptiler.com/maps/street-v2/style.json?key=BNmrQVafEFp815tidnaN", style -> {
+        String styleUrl = "https://api.maptiler.com/maps/streets/style.json?key=BNmrQVafEFp815tidnaN";
+
+        mapLibreMap.setStyle(styleUrl, style -> {
             LatLng location = new LatLng(lat, lng);
-            mapLibreMap.moveCamera(org.maplibre.android.camera.CameraUpdateFactory.newLatLngZoom(location, 5));
-            mapLibreMap.addMarker(new MarkerOptions().position(location).title("Competition Location"));
+            
+            // Set camera position with better zoom
+            mapLibreMap.setCameraPosition(new CameraPosition.Builder()
+                .target(location)
+                .zoom(15)
+                .build());
+
+            // Add marker with better styling
+            mapLibreMap.addMarker(new MarkerOptions()
+                .position(location)
+                .title("Competition Location")
+                .snippet("Lat: " + String.format("%.6f", lat) + ", Lng: " + String.format("%.6f", lng)));
+
         });
     }
 
@@ -57,7 +79,7 @@ public class MapViewLocationActivity extends AppCompatActivity implements OnMapR
     @Override protected void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState); mapView.onSaveInstanceState(outState); }
     
     @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull android.view.MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;

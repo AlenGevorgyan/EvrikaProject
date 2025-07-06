@@ -21,7 +21,7 @@ public class RegisteredGamesFragment extends Fragment {
     private RecyclerView recyclerView;
     private CompetitionAdapter adapter;
     private List<Competition> registeredCompetitions = new ArrayList<>();
-    private String userId;
+    private String currentUserId;
 
     @Nullable
     @Override
@@ -29,7 +29,7 @@ public class RegisteredGamesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_registered_games, container, false);
         recyclerView = view.findViewById(R.id.recycler_competitions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         
         // Initialize adapter first
         adapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
@@ -39,8 +39,8 @@ public class RegisteredGamesFragment extends Fragment {
             }
             @Override
             public void onRemove(Competition competition) {
-                if (userId != null && competition.posterId != null) {
-                    FirebaseFirestore.getInstance().collection("users").document(userId)
+                if (currentUserId != null && competition.posterId != null) {
+                    FirebaseFirestore.getInstance().collection("users").document(currentUserId)
                         .update("registeredGames", com.google.firebase.firestore.FieldValue.arrayRemove(competition.posterId))
                         .addOnSuccessListener(aVoid -> {
                             registeredCompetitions.remove(competition);
@@ -55,7 +55,7 @@ public class RegisteredGamesFragment extends Fragment {
             public void onViewDetails(Competition competition) {
                 // Handle view details if needed
             }
-        }, userId, true);
+        }, currentUserId, true);
         recyclerView.setAdapter(adapter);
         
         loadRegisteredGames();
@@ -63,12 +63,12 @@ public class RegisteredGamesFragment extends Fragment {
     }
 
     private void loadRegisteredGames() {
-        if (userId == null) {
+        if (currentUserId == null) {
             showEmpty();
             return;
         }
         
-        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+        FirebaseFirestore.getInstance().collection("users").document(currentUserId).get()
             .addOnSuccessListener(doc -> {
                 if (doc.exists()) {
                     List<String> registeredGameIds = (List<String>) doc.get("registeredGames");
@@ -101,7 +101,7 @@ public class RegisteredGamesFragment extends Fragment {
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Competition comp = doc.toObject(Competition.class);
                         if (comp != null) {
-                            comp.posterId = doc.getId(); // Set the document ID as posterId
+                            comp.compId = doc.getId(); // Set the document ID as compId
                             registeredCompetitions.add(comp);
                         }
                     }

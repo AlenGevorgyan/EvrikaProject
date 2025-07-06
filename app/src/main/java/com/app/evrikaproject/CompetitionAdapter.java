@@ -63,14 +63,10 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
             holder.bgSportImage.setImageResource(R.drawable.ic_launcher_background);
         }
         boolean isRegistered = registeredGameIds != null && comp.posterId != null && registeredGameIds.contains(comp.posterId);
-        boolean isHost = userId != null && userId.equals(comp.createdBy);
+        boolean isHost = userId != null && userId.equals(comp.posterId);
         
         // Debug logging
-        android.util.Log.d("CompetitionAdapter", "Competition: " + comp.game_name);
-        android.util.Log.d("CompetitionAdapter", "posterId: " + comp.posterId);
-        android.util.Log.d("CompetitionAdapter", "createdBy: " + comp.createdBy);
-        android.util.Log.d("CompetitionAdapter", "userId: " + userId);
-        android.util.Log.d("CompetitionAdapter", "isHost: " + isHost);
+        android.util.Log.d("CompetitionAdapter", "game_name: " + comp.game_name + ", posterId: " + comp.posterId + ", userId: " + userId + ", isHost: " + isHost);
         android.util.Log.d("CompetitionAdapter", "isRegistered: " + isRegistered);
         android.util.Log.d("CompetitionAdapter", "registeredMode: " + registeredMode);
         
@@ -80,33 +76,32 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
         holder.btnDelete.setVisibility(View.GONE);
         holder.btnRequestJoin.setVisibility(View.GONE);
         
-        if (registeredMode || isRegistered) {
+        if (isHost) {
+            holder.btnEdit.setVisibility(View.VISIBLE);
+            holder.btnDelete.setVisibility(View.VISIBLE);
             holder.btnViewDetails.setText("Chat");
             holder.btnViewDetails.setOnClickListener(v -> {
-                // Launch chat activity
                 android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
                 intent.putExtra("competition_id", comp.posterId);
                 intent.putExtra("competition_name", comp.game_name);
                 context.startActivity(intent);
             });
-            
-            if (isHost) {
-                // Show edit and delete buttons for host
-                holder.btnEdit.setVisibility(View.VISIBLE);
-                holder.btnDelete.setVisibility(View.VISIBLE);
-                
-                holder.btnEdit.setOnClickListener(v -> {
-                    android.content.Intent intent = new android.content.Intent(context, EditCompetitionActivity.class);
-                    intent.putExtra("competition_id", comp.posterId);
-                    context.startActivity(intent);
-                });
-                
-                holder.btnDelete.setOnClickListener(v -> showDeleteConfirmation(comp));
-            } else {
-                // Show leave button for participants
-                holder.btnLeave.setVisibility(View.VISIBLE);
-                holder.btnLeave.setOnClickListener(v -> listener.onRemove(comp));
-            }
+            holder.btnEdit.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(context, EditCompetitionActivity.class);
+                intent.putExtra("competition_id", comp.posterId);
+                context.startActivity(intent);
+            });
+            holder.btnDelete.setOnClickListener(v -> showDeleteConfirmation(comp));
+        } else if (registeredMode || isRegistered) {
+            holder.btnViewDetails.setText("Chat");
+            holder.btnViewDetails.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(context, ChatActivity.class);
+                intent.putExtra("competition_id", comp.posterId);
+                intent.putExtra("competition_name", comp.game_name);
+                context.startActivity(intent);
+            });
+            holder.btnLeave.setVisibility(View.VISIBLE);
+            holder.btnLeave.setOnClickListener(v -> listener.onRemove(comp));
         } else {
             holder.btnViewDetails.setText("Join now");
             holder.btnViewDetails.setOnClickListener(v -> listener.onJoin(comp));

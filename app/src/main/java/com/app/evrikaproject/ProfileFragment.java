@@ -114,7 +114,7 @@ public class ProfileFragment extends Fragment {
 
     private void showPostedCompetitions() {
         FirebaseFirestore.getInstance().collection("games")
-            .whereEqualTo("createdBy", userId)
+            .whereEqualTo("posterId", userId)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 postedCompetitions.clear();
@@ -124,7 +124,7 @@ public class ProfileFragment extends Fragment {
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
                     Competition comp = doc.toObject(Competition.class);
                     if (comp != null) {
-                        comp.posterId = doc.getId(); // Set the document ID as posterId
+                        comp.compId = doc.getId(); // Set the document ID as compId
                         postedCompetitions.add(comp);
                         postedGameIds.add(doc.getId()); // Add to posted game IDs list
                     }
@@ -132,6 +132,7 @@ public class ProfileFragment extends Fragment {
                 
                 RecyclerView recyclerView = new RecyclerView(getContext());
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
                 postedAdapter = new CompetitionAdapter(getContext(), postedCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
                     @Override
                     public void onJoin(Competition competition) {}
@@ -139,7 +140,7 @@ public class ProfileFragment extends Fragment {
                     public void onRemove(Competition competition) {}
                     @Override
                     public void onViewDetails(Competition competition) {}
-                }, userId, true); // Set to true so posted games show as registered
+                }, currentUserId, true); // Set to true so posted games show as registered
                 
                 // Set the posted game IDs so adapter knows these are games the user is part of
                 postedAdapter.setRegisteredGameIds(postedGameIds);
@@ -170,20 +171,21 @@ public class ProfileFragment extends Fragment {
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Competition comp = doc.toObject(Competition.class);
                         if (comp != null) {
-                            comp.posterId = doc.getId(); // Set the document ID as posterId
+                            comp.compId = doc.getId(); // Set the document ID as compId
                             registeredCompetitions.add(comp);
                         }
                     }
                     RecyclerView recyclerView = new RecyclerView(getContext());
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    String currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
                     registeredAdapter = new CompetitionAdapter(getContext(), registeredCompetitions, new CompetitionAdapter.OnCompetitionClickListener() {
                         @Override
                         public void onJoin(Competition competition) {}
                         @Override
                         public void onRemove(Competition competition) {
-                            if (userId == null) return;
-                            FirebaseFirestore.getInstance().collection("users").document(userId)
-                                .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
+                            if (currentUserId == null) return;
+                            FirebaseFirestore.getInstance().collection("users").document(currentUserId)
+                                .update("registeredGames", FieldValue.arrayRemove(competition.compId))
                                 .addOnSuccessListener(aVoid -> {
                                     // Refresh the registered games list
                                     loadUserRegisteredGames();
@@ -192,7 +194,7 @@ public class ProfileFragment extends Fragment {
                         }
                         @Override
                         public void onViewDetails(Competition competition) {}
-                    }, userId, true);
+                    }, currentUserId, true);
                     recyclerView.setAdapter(registeredAdapter);
                     competitionsContainer.removeAllViews();
                     competitionsContainer.addView(recyclerView);

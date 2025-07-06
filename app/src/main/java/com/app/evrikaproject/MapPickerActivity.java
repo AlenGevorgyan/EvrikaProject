@@ -58,7 +58,7 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onMapReady(@NonNull MapLibreMap mapLibreMap) {
         this.mapLibreMap = mapLibreMap;
-        mapLibreMap.setStyle("https://api.maptiler.com/maps/streets/style.json?key=wxQI2tnsdCLI4pSXvQVA", style -> {
+        mapLibreMap.setStyle("https://api.maptiler.com/maps/streets/style.json?key=BNmrQVafEFp815tidnaN", style -> {
             mapLibreMap.addOnMapClickListener(point -> {
                 selectedLatLng = point;
                 mapLibreMap.clear();

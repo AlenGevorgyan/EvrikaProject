@@ -41,12 +41,12 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         recyclerView = view.findViewById(R.id.recycler_competitions);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         adapter = new CompetitionAdapter(getContext(), competitions, new CompetitionAdapter.OnCompetitionClickListener() {
             @Override
             public void onJoin(Competition competition) {
-                if (userId == null) return;
-                FirebaseFirestore.getInstance().collection("users").document(userId)
+                if (currentUserId == null) return;
+                FirebaseFirestore.getInstance().collection("users").document(currentUserId)
                     .update("registeredGames", FieldValue.arrayUnion(competition.posterId))
                     .addOnSuccessListener(aVoid -> {
                         registeredGames.add(competition.posterId);
@@ -57,8 +57,8 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
             }
             @Override
             public void onRemove(Competition competition) {
-                if (userId == null) return;
-                FirebaseFirestore.getInstance().collection("users").document(userId)
+                if (currentUserId == null) return;
+                FirebaseFirestore.getInstance().collection("users").document(currentUserId)
                     .update("registeredGames", FieldValue.arrayRemove(competition.posterId))
                     .addOnSuccessListener(aVoid -> {
                         registeredGames.remove(competition.posterId);
@@ -74,11 +74,11 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
                     .addToBackStack(null)
                     .commit();
             }
-        }, userId, false);
+        }, currentUserId, false);
         recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
-        loadUserRegisteredGames(userId);
+        loadUserRegisteredGames(currentUserId);
 
         FloatingActionButton fab = view.findViewById(R.id.fab_create_competition);
         fab.setOnClickListener(v -> {
@@ -139,7 +139,7 @@ public class HomeFragment extends Fragment implements CompetitionAdapter.OnCompe
         for (DocumentSnapshot doc : queryDocumentSnapshots) {
             Competition comp = doc.toObject(Competition.class);
             if (comp != null) {
-                comp.posterId = doc.getId(); // Set the document ID as posterId
+                comp.compId = doc.getId(); // Set the document ID as compId
                 competitions.add(comp);
                 allCompetitions.add(comp);
             }

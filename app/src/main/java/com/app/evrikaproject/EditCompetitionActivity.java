@@ -139,7 +139,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
             btnPrivate.setTextColor(getResources().getColor(android.R.color.white));
             btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
             btnPublic.setTextColor(getResources().getColor(android.R.color.black));
-            if (requestsCard != null && competition != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
+            if (requestsCard != null && competition != null && currentUserId.equals(competition.getPosterId())) requestsCard.setVisibility(View.VISIBLE);
         });
     }
 
@@ -150,7 +150,7 @@ public class EditCompetitionActivity extends AppCompatActivity {
                     competition = documentSnapshot.toObject(Competition.class);
                     if (competition != null) {
                         // Check if current user is the host
-                        if (!currentUserId.equals(competition.getCreatedBy())) {
+                        if (!currentUserId.equals(competition.getPosterId())) {
                             Toast.makeText(this, "Only the host can edit this competition", Toast.LENGTH_SHORT).show();
                             finish();
                             return;
@@ -187,13 +187,13 @@ public class EditCompetitionActivity extends AppCompatActivity {
                                 btnPrivate.setTextColor(getResources().getColor(android.R.color.white));
                                 btnPublic.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.gray)));
                                 btnPublic.setTextColor(getResources().getColor(android.R.color.black));
-                                if (requestsCard != null && currentUserId.equals(competition.getCreatedBy())) requestsCard.setVisibility(View.VISIBLE);
+                                if (requestsCard != null && currentUserId.equals(competition.getPosterId())) requestsCard.setVisibility(View.VISIBLE);
                             }
                         }
 
                         // Show/hide requests card based on type
                         if (requestsCard != null) {
-                            if ("private".equals(competition.getType()) && currentUserId.equals(competition.getCreatedBy())) {
+                            if ("private".equals(competition.getType()) && currentUserId.equals(competition.getPosterId())) {
                                 requestsCard.setVisibility(View.VISIBLE);
                                 showRequests();
                             } else {

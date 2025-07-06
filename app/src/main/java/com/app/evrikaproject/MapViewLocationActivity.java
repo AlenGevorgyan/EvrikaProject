@@ -41,7 +41,7 @@ public class MapViewLocationActivity extends AppCompatActivity implements OnMapR
 
     @Override
     public void onMapReady(@NonNull MapLibreMap mapLibreMap) {
-        mapLibreMap.setStyle("https://api.maptiler.com/maps/street/style.json?key=wxQI2tnsdCLI4pSXvQVA", style -> {
+        mapLibreMap.setStyle("https://api.maptiler.com/maps/street-v2/style.json?key=BNmrQVafEFp815tidnaN", style -> {
             LatLng location = new LatLng(lat, lng);
             mapLibreMap.moveCamera(org.maplibre.android.camera.CameraUpdateFactory.newLatLngZoom(location, 20));
             mapLibreMap.addMarker(new MarkerOptions().position(location).title("Competition Location"));

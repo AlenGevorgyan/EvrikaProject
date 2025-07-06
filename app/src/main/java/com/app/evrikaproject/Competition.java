@@ -7,7 +7,6 @@ public class Competition {
     public String game_name;
     public String sport;
     public String type; // "public" or "private"
-    public String createdBy;
     public List<String> teams;
     public List<String> invitedTeams;
     public String date;
@@ -16,15 +15,16 @@ public class Competition {
     public double longitude;
     public String time;
     public List<String> requests; // User IDs who requested to join (for private games)
+    public String compId;
 
     public Competition() {} // Firestore needs this
 
-    public Competition(String id, String game_name, String sport, String type, String createdBy, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time, List<String> requests) {
-        this.posterId = id;
+    public Competition(String compId, String posterId, String game_name, String sport, String type, List<String> teams, List<String> invitedTeams, String date, int teamPlayerCount, double latitude, double longitude, String time, List<String> requests) {
+        this.compId = compId;
+        this.posterId = posterId;
         this.game_name = game_name;
         this.sport = sport;
         this.type = type;
-        this.createdBy = createdBy;
         this.teams = teams;
         this.invitedTeams = invitedTeams;
         this.date = date;
@@ -65,14 +65,6 @@ public class Competition {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
     }
 
     public List<String> getTeams() {
@@ -137,5 +129,13 @@ public class Competition {
 
     public void setRequests(List<String> requests) {
         this.requests = requests;
+    }
+
+    public String getCompId() {
+        return compId;
+    }
+
+    public void setCompId(String compId) {
+        this.compId = compId;
     }
 }

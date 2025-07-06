@@ -228,11 +228,11 @@ public class CreateCompetitionFragment extends Fragment {
                         Log.d("Firestore", "Document uploaded successfully");
                         // Add the host to their own registered games
                         addHostToOwnGame(compId, userId);
-                        // Create an empty 'messages' subcollection under the game document
+                        // Create an empty 'chats' subcollection under the game document
                         FirebaseFirestore.getInstance().collection("games").document(compId)
-                            .collection("messages").document("init").set(new HashMap<>())
-                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Messages subcollection initialized"))
-                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to initialize messages subcollection: " + e.getMessage()));
+                            .collection("chat").document("init").set(new HashMap<>())
+                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Chats subcollection initialized"))
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to initialize chats subcollection: " + e.getMessage()));
                         // Navigate to home (MainActivity)
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

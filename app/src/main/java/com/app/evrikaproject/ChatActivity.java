@@ -130,7 +130,7 @@ public class ChatActivity extends AppCompatActivity {
     private void loadMessages() {
         // Load messages directly from games collection
         db.collection("games").document(competitionId)
-            .collection("messages")
+            .collection("chat")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener((value, error) -> {
                 if (error != null) {
@@ -171,7 +171,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Create message document ID
         String messageId = db.collection("games").document(competitionId)
-            .collection("messages").document().getId();
+            .collection("chats").document().getId();
         
         // Create chat message with proper sender name
         String senderName = currentUserName != null ? currentUserName : "Anonymous";
@@ -183,7 +183,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void saveMessageToGamesCollection(ChatMessage message, String messageId) {
         db.collection("games").document(competitionId)
-            .collection("messages").document(messageId).set(message)
+            .collection("chat").document(messageId).set(message)
             .addOnSuccessListener(aVoid -> {
                 etMessage.setText("");
                 Toast.makeText(ChatActivity.this, "Message sent successfully!", Toast.LENGTH_SHORT).show();

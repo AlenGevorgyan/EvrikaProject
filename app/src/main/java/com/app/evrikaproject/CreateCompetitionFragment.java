@@ -145,7 +145,19 @@ public class CreateCompetitionFragment extends Fragment {
         } else if (requestCode == PICK_LOCATION_REQUEST && resultCode == getActivity().RESULT_OK && data != null) {
             selectedLat = data.getDoubleExtra("lat", 0);
             selectedLng = data.getDoubleExtra("lng", 0);
-            tvLocation.setText("Lat: " + selectedLat + ", Lng: " + selectedLng);
+            if (selectedLat != 0 && selectedLng != 0) {
+                tvLocation.setText("Location: Lat: " + String.format("%.6f", selectedLat) + ", Lng: " + String.format("%.6f", selectedLng));
+                tvLocation.setError(null);
+            } else {
+                tvLocation.setText("No location selected");
+                tvLocation.setError("Please select a location");
+            }
+        } else if (requestCode == PICK_LOCATION_REQUEST && resultCode == getActivity().RESULT_CANCELED) {
+            // User cancelled location selection
+            if (selectedLat == 0 && selectedLng == 0) {
+                tvLocation.setText("No location selected");
+                tvLocation.setError("Please select a location");
+            }
         }
     }
 

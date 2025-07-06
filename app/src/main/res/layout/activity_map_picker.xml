@@ -20,13 +20,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btn_confirm_location"
+    <!-- Loading and Status Overlay -->
+    <LinearLayout
+        android:id="@+id/overlay_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/edittext_white"
+        android:padding="20dp"
+        android:layout_margin="32dp"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading map..."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm_location"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:text="Confirm Location"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:background="@color/colorPrimary"
-        android:textColor="@color/black"/>
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:elevation="8dp"/>
 </RelativeLayout> 

@@ -37,7 +37,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         // Get data from intent
-        competitionId = getIntent().getStringExtra("competition_id");
+        competitionId = getIntent().getStringExtra("compId");
         competitionName = getIntent().getStringExtra("competition_name");
         currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? 
                        FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
@@ -128,23 +128,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
-        // First check if chat room exists
-        db.collection("chat_rooms").document(competitionId).get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Chat room exists, load messages
-                    loadMessagesFromSubcollection();
-                } else {
-                    Toast.makeText(ChatActivity.this, "Chat room doesn't exist yet", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(ChatActivity.this, "Error checking chat room: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-    }
-
-    private void loadMessagesFromSubcollection() {
-        db.collection("chat_rooms").document(competitionId)
+        // Load messages directly from games collection
+        db.collection("games").document(competitionId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener((value, error) -> {
@@ -185,90 +170,26 @@ public class ChatActivity extends AppCompatActivity {
         Toast.makeText(this, "Sending message: " + messageText, Toast.LENGTH_SHORT).show();
 
         // Create message document ID
-        String messageId = db.collection("chat_rooms").document(competitionId)
+        String messageId = db.collection("games").document(competitionId)
             .collection("messages").document().getId();
         
         // Create chat message with proper sender name
         String senderName = currentUserName != null ? currentUserName : "Anonymous";
         ChatMessage message = new ChatMessage(messageId, currentUserId, senderName, messageText);
         
-        // First ensure chat room exists, then save message
-        db.collection("chat_rooms").document(competitionId).get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Chat room exists, save message
-                    saveMessageToSubcollection(message, messageId);
-                } else {
-                    // Create chat room first, then save message
-                    List<String> participantIds = new ArrayList<>();
-                    participantIds.add(currentUserId);
-                    
-                    ChatRoom chatRoom = new ChatRoom(competitionId, competitionId, competitionName, participantIds);
-                    db.collection("chat_rooms").document(competitionId).set(chatRoom)
-                        .addOnSuccessListener(aVoid -> {
-                            saveMessageToSubcollection(message, messageId);
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(ChatActivity.this, "Failed to create chat room: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-                }
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(ChatActivity.this, "Failed to check chat room: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+        // Save message directly to games collection
+        saveMessageToGamesCollection(message, messageId);
     }
 
-    private void updateChatRoomLastMessage(String lastMessage) {
-        // Update or create chat room
-        db.collection("chat_rooms").document(competitionId).get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // Update existing chat room
-                    documentSnapshot.getReference().update("lastMessage", lastMessage, "lastMessageTime", com.google.firebase.Timestamp.now());
-                } else {
-                    // Create new chat room
-                    List<String> participantIds = new ArrayList<>();
-                    participantIds.add(currentUserId);
-                    
-                    ChatRoom chatRoom = new ChatRoom(competitionId, competitionId, competitionName, participantIds);
-                    chatRoom.setLastMessage(lastMessage);
-                    chatRoom.setLastMessageTime(com.google.firebase.Timestamp.now());
-                    
-                    db.collection("chat_rooms").document(competitionId).set(chatRoom);
-                }
-            });
-    }
-
-    private void saveMessageToSubcollection(ChatMessage message, String messageId) {
-        db.collection("chat_rooms").document(competitionId)
+    private void saveMessageToGamesCollection(ChatMessage message, String messageId) {
+        db.collection("games").document(competitionId)
             .collection("messages").document(messageId).set(message)
             .addOnSuccessListener(aVoid -> {
                 etMessage.setText("");
-                // Update chat room with last message from subcollection
-                updateLastMessageFromSubcollection();
                 Toast.makeText(ChatActivity.this, "Message sent successfully!", Toast.LENGTH_SHORT).show();
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(ChatActivity.this, "Failed to send message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-    }
-
-    // Method to get the last message from the subcollection
-    private void updateLastMessageFromSubcollection() {
-        db.collection("chat_rooms").document(competitionId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(1)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                if (!queryDocumentSnapshots.isEmpty()) {
-                    ChatMessage lastMessage = queryDocumentSnapshots.getDocuments().get(0).toObject(ChatMessage.class);
-                    if (lastMessage != null) {
-                        db.collection("chat_rooms").document(competitionId)
-                            .update("lastMessage", lastMessage.getMessage(), 
-                                   "lastMessageTime", lastMessage.getTimestamp());
-                    }
-                }
             });
     }
 

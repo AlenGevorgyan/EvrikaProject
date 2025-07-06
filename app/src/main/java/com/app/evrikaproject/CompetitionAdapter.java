@@ -187,15 +187,7 @@ public class CompetitionAdapter extends RecyclerView.Adapter<CompetitionAdapter.
                             .collection("games").document(competition.posterId)
                             .delete()
                             .addOnSuccessListener(aVoid -> {
-                                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                                        .collection("chat_rooms").document(competition.posterId)
-                                        .delete()
-                                        .addOnSuccessListener(aVoid2 -> {
-                                            android.widget.Toast.makeText(context, "Competition deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            android.widget.Toast.makeText(context, "Competition deleted but failed to delete chat room", android.widget.Toast.LENGTH_SHORT).show();
-                                        });
+                                android.widget.Toast.makeText(context, "Competition deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(e -> {
                                 android.widget.Toast.makeText(context, "Failed to delete competition: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
